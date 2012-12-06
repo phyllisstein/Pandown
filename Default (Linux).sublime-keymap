@@ -1,0 +1,7 @@
+[
+	{
+		"keys": ["ctrl+alt+b"],
+		"command": "pandown_build",
+		"args": { "to_window": true }
+	}
+]

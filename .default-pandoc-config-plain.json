@@ -1,0 +1,65 @@
+{
+	"pandoc_arguments":
+	{
+		"data_dir": "",
+		"markdown_strict": false,
+		"parse_raw": true,
+		"smart": true,
+		"old_dashes": false,
+		"base_header_level": 1,
+		"indented_code_classes":
+		[
+		],
+		"normalize": true,
+		"tab_stop": 4,
+		"standalone": true,
+		"template": "",
+		"variables":
+		{
+		},
+		"no_wrap": false,
+		"columns": -1,
+		"table_of_contents": false,
+		"no_highlight": false,
+		"highlight_style": "",
+		"include_in_header": [],
+		"include_before_body": [],
+		"include_after_body": [],
+		"self_contained": false,
+		"ascii": false,
+		"reference_links": false,
+		"atx_headers": false,
+		"chapters": false,
+		"number_sections": false,
+		"no_tex_ligatures": false,
+		"listings": false,
+		"incremental": false,
+		"slide_level": -1,
+		"section_divs": false,
+		"email_obfuscation": "",
+		"id_prefix": "",
+		"title_prefix": "",
+		"css":
+		[
+		],
+		"reference_odt": "",
+		"reference_docx": "",
+		"epub_stylesheet": "",
+		"epub_coverimage": "",
+		"epub_metadata": "",
+		"epub_embed_font": "",
+		"latex_engine": "",
+		"bibliography": "",
+		"csl": "",
+		"citation_abbreviations": "",
+		"natbib": false,
+		"biblatex": false,
+		"gladtex": false,
+		"latexmathml": false,
+		"mathml": false,
+		"jsmath": false,
+		"mathjax": false,
+		"mimetex": false,
+		"webtex": false
+	}
+}

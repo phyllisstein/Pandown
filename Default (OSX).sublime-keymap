@@ -1,0 +1,11 @@
+[
+	{
+		"keys": ["ctrl+super+b"],
+		"command": "pandown_build",
+		"args": { "to_window": true }
+	},
+	{
+		"keys": ["ctrl+super+,"],
+		"command": "pandown_touch_project_config"
+	}
+]

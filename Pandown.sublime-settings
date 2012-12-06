@@ -1,0 +1,275 @@
+{
+	// By default, Pandoc is installed in /usr/local/bin.
+	// If this is different on your setup, modify this setting.
+	"install_path": "/usr/local/bin",
+
+	// In order to produce PDF output, Pandoc needs to know where your
+	// pdfLaTeX lives. Change according to your setup.
+	"texbin_path": "/usr/texbin",
+
+	// Pandoc apparently doesn't search for values for its --include
+	// arguments anywhere but the working directory, which makes
+	// working from a standard stylesheet or standard script
+	// sort of tedious. Set a list of paths here if you'd like the plugin
+	// to always check for these somewhere else. If this is set, the plugin
+	// will prefer a file in the working directory, then in the first path
+	// provided, then in the second, and so on; if it cannot find a file,
+	// it will pass the raw setting to Pandoc. (So it's still safe to specify
+	// absolute paths.)
+	"includes_paths":
+	[
+	],
+
+	// Should the output file always be opened in its native application,
+	// regardless of whether Build-->Run is invoked?
+	"always_open": false,
+
+	// Should the output file be loaded in a new Sublime column?
+	// This is disabled by default because it's unusual behavior,
+	// and overridden by several of the build variants whose output
+	// cannot be opened in Sublime.
+	"always_display": false,
+
+	// There's really no need to make any changes here; the preferred way to set
+	// all of this is in Packages/User/Pandown.sublime-settings, or in an individual
+	// project's pandoc-config.json file. If you haven't yet, take a look at
+	// the readme for information about configuring these options.
+	"pandoc_arguments":
+	{
+		// Modify this setting to tell Pandoc to look for any of the following
+		// in the specified directory rather than ~/.pandoc or Pandoc's default
+		// directory tree. Note that this is not an all-purpose includes
+		// directory---Pandoc will only look for these files and folders.
+		// 		data_dir/
+		//			reference.odt
+		//			reference.docx
+		//			default.csl
+		//			epub.css
+		//			slidy/
+		//			slideous/
+		//			s5/
+		//			templates/
+		// Anything placed under templates and will be found by the "template"
+		// setting; otherwise, to set an include directory, use the "includes_paths"
+		// option above.
+		"data_dir": "",
+		
+		// Disable Pandoc's Markdown extensions.
+		"markdown_strict": false,
+
+		// "Parse untranslatable HTML codes and LaTeX environments as
+		// raw HTML or LaTeX, instead of ignoring them."
+		"parse_raw": true,
+
+		// Straight quotes into curly quotes, --- to em-dash, -- to en-dash,
+		// ... to ellipsis, nonbreaking spaces after certain abbreviations.
+		"smart": true,
+
+		// - before a numeral to en-dash, -- to em-dash
+		"old_dashes": false,
+
+		// "Speficy the base level for headers"
+		"base_header_level": 1,
+
+		// Apply code classes to all indented code blocks.
+		// MUST BE DEFINED AS A LIST, EVEN IF EMPTY. This is correct:
+		//		"indented_code_classes": [],
+		// and so is this:
+		//		"indented_code_classes": [ "numberLines" ],
+		// but this is not:
+		//		"indented_code_classes": "numberLines"
+		"indented_code_classes":
+		[
+		],
+		
+		// Merge adjacent elements, remove repeated spaces, etc.
+		"normalize": true,
+
+		// Set the number of spaces per tab.
+		"tab_stop": 4,
+
+		// Generate "an appropriate header and footer"
+		"standalone": true,
+
+		// Use a template file other than the default to
+		// generate output. Pandoc will look for a template in the
+		// working directory, then data_dir/templates/, then its
+		// built-in directory tree.
+		// See Pandoc's README for information about templates:
+		// http://johnmacfarlane.net/pandoc/README.html#templates
+		"template": "",
+
+		// Supply a dict of keys and values to be passed to
+		// the template file. Values may be lists
+		// if your template includes loops; see this plugin's README.
+		"variables":
+		{
+		},
+
+		// By default, text is wrapped for the output format.
+		"no_wrap": false,
+
+		// If wrapping text, wrap to "columns" columns.
+		"columns": -1,
+
+		// Generate and include a table of contents.
+		"table_of_contents": false,
+
+		// Disable syntax highlighting globally.
+		"no_highlight": false,
+
+		// Style to use for syntax highlighting.
+		// Valid highlight_style values:
+		// "pygments" (default), "kate", "monochrome",
+		// "espresso", "zenburn", "haddock", "tango"
+		"highlight_style": "",
+
+		
+		// Supply lists of files---NOT single file names---to include verbatim in the output.
+		// This is correct:
+		//			"include_in_header": [ "myfile" ]
+		// and this is not:
+		//			"include_in_header": "myfile"
+		// Default templates support multiple includes.
+		// Insert just before </head>
+		"include_in_header": [],
+		// Insert just after <body>
+		"include_before_body": [],
+		// Insert includes just before </body>
+		"include_after_body": [],
+
+		// Convert includes to 'data:' URIs so that the
+		// output can be viewed offline.
+		"self_contained": false,
+
+		// In HTML output ONLY, restrict to ASCII characters
+		// with numerical HTML entities.
+		"ascii": false,
+
+		// When outputting Markdown, use reference-style links (e.g. [go here!][1])
+		// rather than inline (e.g. [do here!](http://place.the) ).
+		"reference_links": false,
+
+		// Force use of ATX-style headers ("# H1", "## H2", etc.) in output.
+		// The default is to use a combination, with setext-style headers:
+		// H1
+		// ===
+		//
+		// for H1 and H2, then ATX.
+		"atx_headers": false,
+
+		// Top-level headers become TeX/Docbook chapters.
+		"chapters": false,
+
+		// Generate section numbers.
+		"number_sections": false,
+
+		// "Do not convert quotation marks, apostrophes, and dashes to the TeX ligatures"
+		"no_tex_ligatures": false,
+
+		// Use listings package for TeX code
+		"listings": false,
+
+		// In slideshow output, display list items one slide at a time.
+		"incremental": false,
+
+		// Header level at which to break slides. Above breaks sections, below
+		// creates subheads. Normally set based on context of document.
+		// See: http://johnmacfarlane.net/pandoc/README.html#structuring-the-slide-show
+		"slide_level": -1,
+
+		// Enclose sections in <div> or <section> tags, attach "id" attributes based on
+		// the section name.
+		"section_divs": false,
+
+		// Conceal mailto: links from robots.
+		// Acceptable values: "none", "javascript", "references"
+		"email_obfuscation": "",
+
+		// "Specify a prefix to be added to all automatically generated identifiers
+		// in HTML output. This is useful for preventing duplicate identifiers when
+		// generating fragments to be included in other pages."
+		"id_prefix": "",
+
+		// Insert a string before the header title tag but not the body title
+		"title_prefix": "",
+
+		// Link to any number of CSS stylesheets
+		// without triggering the standalone include features.
+		"css":
+		[
+		],
+
+		// "Use the specified file as a style reference in producing a [desired] file.
+		// For best results, the reference [file] should be a modified version of
+		// a [desired] file produced using pandoc."
+		"reference_odt": "",
+		"reference_docx": "",
+
+		// "Use the specified CSS file to style the EPUB. If no stylesheet is specified,
+		// pandoc will look for a file epub.css in the user data directory (see --data-dir).
+		// If it is not found there, sensible defaults will be used."
+		"epub_stylesheet": "",
+		
+		// Set cover to a specified image.
+		"epub_coverimage": "",
+
+		// Link to an XML file containing EPUB metadata in Dublin Core Elements format.
+		// See http://dublincore.org/documents/dces/
+		"epub_metadata": "",
+
+		// Use the stylesheet specified to embed fonts. Should contain a series of
+		// @font-face elements and CSS describing where they're to be used.
+		"epub_embed_font": "",
+
+		// Appropriate values: "pdflatex" (default), "xelatex", "lulalatex"
+		"latex_engine": "",
+
+		// Specify bibliography database to be used in resolving citations. The database
+		// type will be determined from the extension of FILE, which may be .mods (MODS format),
+		// .bib (BibTeX/BibLaTeX format), .ris (RIS format), .enl (EndNote format), .xml (EndNote XML format),
+		// .wos (ISI format), .medline (MEDLINE format), .copac (Copac format), or .json (citeproc JSON).
+		// If you want to use multiple bibliographies, just use this option repeatedly.
+		"bibliography": "",
+
+		// Link to a CSL (http://citationstyles.org) file for formatting citations.
+		"csl": "",
+
+		// "Specify a file containing abbreviations for journal titles and other
+		// bibliographic fields (indicated by setting form="short" in the CSL node
+		// for the field). The format is described at
+		// http://citationstylist.org/2011/10/19/abbreviations-for-zotero-test-release/"
+		"citation_abbreviations": "",
+
+		// Use natbib for LaTeX citations.
+		"natbib": false,
+
+		// Use BibLaTeX for LaTeX citations.
+		"biblatex": false,
+
+
+		// Place TeX math between <eq> tags in HTML output.
+		"gladtex": false,
+		
+		// Each of the following can be false, true, or a URL string.
+		// Setting to a URL string implies true.
+		// Use http://math.etsu.edu/LaTeXMathML/ to format TeX math. If no URL
+		// is specified, Pandoc will insert the code for you.
+		"latexmathml": false,
+		// Convert TeX math to MathML and include a JavaScript to display.
+		"mathml": false,
+		// Use http://www.math.union.edu/~dpvc/jsmath/ for TeX math. URL must point
+		// to its load script, which will not be automatically added by Pandoc.
+		"jsmath": false,
+		// Use http://www.mathjax.org/ for TeX math. URL must point to MathJax.jds
+		// load script. If no URL is provided, Pandoc script will add one.
+		"mathjax": false,
+		// Render TeX math with mimetex (http://www.forkosh.com/mimetex.html). If no
+		// URL is supplied, /cgi-bin/mimetex.cgi is assumed.
+		"mimetex": false,
+		// Render TeX formulas using an external script that converts TeX formulas
+		// to images. The formula will be concatenated with the URL provided.
+		// If URL is not specified, the Google Chart API will be used.
+		"webtex": false
+	}
+}
