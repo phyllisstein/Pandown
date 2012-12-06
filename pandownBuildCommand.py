@@ -247,6 +247,8 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
             s.update(p)
 
         try:
+            includes_paths = self._getSetting("includes_paths", [])
+            includes_paths_len = len(includes_paths)
             if s["data_dir"]:
                 cmd.append("--data-dir=" + s["data_dir"])
             if s["markdown_strict"]:
@@ -274,10 +276,9 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
                 cmd.append("--standalone")
 
             if s["template"]:
-                includes_paths = self._getSetting("includes_paths", [])
-                if len(includes_paths) == 0:
+                if includes_paths_len == 0:
                     cmd.append("--template=" + s["template"])
-                elif len(includes_paths) > 0 and isinstance(includes_paths, list):
+                elif includes_paths_len > 0 and isinstance(includes_paths, list):
                     toAppend = ""
                     if os.path.exists(os.path.join(self.workingDIR, s["template"])):
                         toAppend = "--template=" + os.path.join(self.workingDIR, s["template"])
@@ -312,9 +313,7 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
 
             # As inappropriate as all this typechecking is, I can't think of another way to
             # be absolutely sure that the user didn't pass in a single string.
-            includes_paths = self._getSetting("includes_paths", [])
-            debug(str(includes_paths))
-            if len(includes_paths) == 0:
+            if includes_paths_len == 0:
                 if isinstance(s["include_in_header"], list):
                     for theInclude in s["include_in_header"]:
                         cmd.append("--include-in-header=" + str(theInclude))
@@ -324,7 +323,7 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
                 if isinstance(s["include_after_body"], list):
                     for theInclude in s["include_after_body"]:
                         cmd.append("--include-after-body=" + str(theInclude))
-            elif len(includes_paths) > 0 and isinstance(includes_paths, list):
+            elif includes_paths_len > 0 and isinstance(includes_paths, list):
                 if isinstance(s["include_in_header"], list) and len(s["include_in_header"]) > 0:
                     for theInclude in s["include_in_header"]:
                         toAppend = ""
@@ -407,21 +406,160 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
                     cmd.append("--css=" + theCSS)
 
             if s["reference_odt"] != "":
-                cmd.append("--reference-odt=" + s["reference_odt"])
+                if includes_paths_len == 0:
+                    cmd.append("--reference-odt=" + s["reference_odt"])
+                elif includes_paths_len > 0 and isinstance(includes_paths, list):
+                    toAppend = ""
+                    if os.path.exists(os.path.join(self.workingDIR, s["reference_odt"])):
+                        toAppend = "--reference-odt=" + os.path.join(self.workingDIR, s["reference_odt"])
+                    else:
+                        for theIncludesPath in includes_paths:
+                            theIncludesPath = os.path.abspath(theIncludesPath)
+                            checkFile = os.path.join(theIncludesPath, s["reference_odt"])
+                            if os.path.exists(checkFile):
+                                toAppend = "--reference-odt=" + checkFile
+                                break
+                    if not toAppend:
+                        toAppend = "--reference-odt=" + s["reference_odt"]
+                    cmd.append(toAppend)
             if s["reference_docx"] != "":
-                cmd.append("--reference-docx=" + s["reference_docx"])
+                if includes_paths_len == 0:
+                    cmd.append("--reference-docx=" + s["reference_docx"])
+                elif includes_paths_len > 0 and isinstance(includes_paths, list):
+                    toAppend = ""
+                    if os.path.exists(os.path.join(self.workingDIR, s["reference_docx"])):
+                        toAppend = "--reference-docx=" + os.path.join(self.workingDIR, s["reference_docx"])
+                    else:
+                        for theIncludesPath in includes_paths:
+                            theIncludesPath = os.path.abspath(theIncludesPath)
+                            checkFile = os.path.join(theIncludesPath, s["reference_docx"])
+                            if os.path.exists(checkFile):
+                                toAppend = "--reference-docx=" + checkFile
+                                break
+                    if not toAppend:
+                        toAppend = "--reference-docx=" + s["reference_docx"]
+                    cmd.append(toAppend)
             if s["epub_stylesheet"] != "":
-                cmd.append("--epub-stylesheet=" + s["epub_stylesheet"])
+                if includes_paths_len == 0:
+                    cmd.append("--epub-stylesheet=" + s["epub_stylesheet"])
+                elif includes_paths_len > 0 and isinstance(includes_paths, list):
+                    toAppend = ""
+                    if os.path.exists(os.path.join(self.workingDIR, s["epub_stylesheet"])):
+                        toAppend = "--epub-stylesheet=" + os.path.join(self.workingDIR, s["epub_stylesheet"])
+                    else:
+                        for theIncludesPath in includes_paths:
+                            theIncludesPath = os.path.abspath(theIncludesPath)
+                            checkFile = os.path.join(theIncludesPath, s["epub_stylesheet"])
+                            if os.path.exists(checkFile):
+                                toAppend = "--epub-stylesheet=" + checkFile
+                                break
+                    if not toAppend:
+                        toAppend = "--epub-stylesheet=" + s["epub_stylesheet"]
+                    cmd.append(toAppend)
             if s["epub_coverimage"] != "":
-                cmd.append("--epub-cover-image=" + s["epub_coverimage"])
+                if includes_paths_len == 0:
+                    cmd.append("--epub-cover-image=" + s["epub_coverimage"])
+                elif includes_paths_len > 0 and isinstance(includes_paths, list):
+                    toAppend = ""
+                    if os.path.exists(os.path.join(self.workingDIR, s["epub_coverimage"])):
+                        toAppend = "--epub-cover-image=" + os.path.join(self.workingDIR, s["epub_coverimage"])
+                    else:
+                        for theIncludesPath in includes_paths:
+                            theIncludesPath = os.path.abspath(theIncludesPath)
+                            checkFile = os.path.join(theIncludesPath, s["epub_coverimage"])
+                            if os.path.exists(checkFile):
+                                toAppend = "--epub-cover-image=" + checkFile
+                                break
+                    if not toAppend:
+                        toAppend = "--epub-cover-image=" + s["epub_coverimage"]
+                    cmd.append(toAppend)
+            if s["epub_metadata"] != "":
+                if includes_paths_len == 0:
+                    cmd.append("--epub-metadata=" + s["epub_metadata"])
+                elif includes_paths_len > 0 and isinstance(includes_paths, list):
+                    toAppend = ""
+                    if os.path.exists(os.path.join(self.workingDIR, s["epub_metadata"])):
+                        toAppend = "--epub-metadata=" + os.path.join(self.workingDIR, s["epub_metadata"])
+                    else:
+                        for theIncludesPath in includes_paths:
+                            theIncludesPath = os.path.abspath(theIncludesPath)
+                            checkFile = os.path.join(theIncludesPath, s["epub_metadata"])
+                            if os.path.exists(checkFile):
+                                toAppend = "--epub-metadata=" + checkFile
+                                break
+                    if not toAppend:
+                        toAppend = "--epub-metadata=" + s["epub_metadata"]
+                    cmd.append(toAppend)
+            if s["epub_embed_font"] != "":
+                if includes_paths_len == 0:
+                    cmd.append("--epub-embed-font=" + s["epub_embed_font"])
+                elif includes_paths_len > 0 and isinstance(includes_paths, list):
+                    toAppend = ""
+                    if os.path.exists(os.path.join(self.workingDIR, s["epub_embed_font"])):
+                        toAppend = "--epub-embed-font=" + os.path.join(self.workingDIR, s["epub_embed_font"])
+                    else:
+                        for theIncludesPath in includes_paths:
+                            theIncludesPath = os.path.abspath(theIncludesPath)
+                            checkFile = os.path.join(theIncludesPath, s["epub_embed_font"])
+                            if os.path.exists(checkFile):
+                                toAppend = "--epub-embed-font=" + checkFile
+                                break
+                    if not toAppend:
+                        toAppend = "--epub-embed-font=" + s["epub_embed_font"]
+                    cmd.append(toAppend)
             if s["latex_engine"] != "":
                 cmd.append("--latex-engine=" + s["latex_engine"])
             if s["bibliography"] != "":
-                cmd.append("--bibliography=" + s["bibliography"])
+                if includes_paths_len == 0:
+                    cmd.append("--bibliography=" + s["bibliography"])
+                elif includes_paths_len > 0 and isinstance(includes_paths, list):
+                    toAppend = ""
+                    if os.path.exists(os.path.join(self.workingDIR, s["bibliography"])):
+                        toAppend = "--bibliography=" + os.path.join(self.workingDIR, s["bibliography"])
+                    else:
+                        for theIncludesPath in includes_paths:
+                            theIncludesPath = os.path.abspath(theIncludesPath)
+                            checkFile = os.path.join(theIncludesPath, s["bibliography"])
+                            if os.path.exists(checkFile):
+                                toAppend = "--bibliography=" + checkFile
+                                break
+                    if not toAppend:
+                        toAppend = "--bibliography=" + s["bibliography"]
+                    cmd.append(toAppend)
             if s["csl"] != "":
-                cmd.append("--csl=" + s["csl"])
+                if includes_paths_len == 0:
+                    cmd.append("--csl=" + s["csl"])
+                elif includes_paths_len > 0 and isinstance(includes_paths, list):
+                    toAppend = ""
+                    if os.path.exists(os.path.join(self.workingDIR, s["csl"])):
+                        toAppend = "--csl=" + os.path.join(self.workingDIR, s["csl"])
+                    else:
+                        for theIncludesPath in includes_paths:
+                            theIncludesPath = os.path.abspath(theIncludesPath)
+                            checkFile = os.path.join(theIncludesPath, s["csl"])
+                            if os.path.exists(checkFile):
+                                toAppend = "--csl=" + checkFile
+                                break
+                    if not toAppend:
+                        toAppend = "--csl=" + s["csl"]
+                    cmd.append(toAppend)
             if s["citation_abbreviations"] != "":
-                cmd.append("--citation-abbreviations=" + s["citation_abbreviations"])
+                if includes_paths_len == 0:
+                    cmd.append("--citation-abbreviations=" + s["citation_abbreviations"])
+                elif includes_paths_len > 0 and isinstance(includes_paths, list):
+                    toAppend = ""
+                    if os.path.exists(os.path.join(self.workingDIR, s["citation_abbreviations"])):
+                        toAppend = "--citation-abbreviations=" + os.path.join(self.workingDIR, s["citation_abbreviations"])
+                    else:
+                        for theIncludesPath in includes_paths:
+                            theIncludesPath = os.path.abspath(theIncludesPath)
+                            checkFile = os.path.join(theIncludesPath, s["citation_abbreviations"])
+                            if os.path.exists(checkFile):
+                                toAppend = "--citation-abbreviations=" + checkFile
+                                break
+                    if not toAppend:
+                        toAppend = "--citation-abbreviations=" + s["citation_abbreviations"]
+                    cmd.append(toAppend)
             if s["natbib"]:
                 cmd.append("--natbib")
             if s["biblatex"]:
