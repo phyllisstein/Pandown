@@ -66,6 +66,11 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
 
         if not self.toWindow:
             self.output_view = self.window.get_output_panel("exec")
+            self.output_view.settings().set("result_file_regex", "")
+            self.output_view.settings().set("result_line_regex", "")
+            self.output_view.settings().set("result_base_dir", "")
+            self.window.get_output_panel("exec")
+
             errorType = OSError
             try:
                 self.theListener = pandownProcess.pandownDefaultListener(self, self.output_view)
@@ -78,6 +83,11 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
             self.theListener.append_data(None, "[Finished]")
         else:
             self.errorView = self.window.get_output_panel("exec")
+            self.errorView.settings().set("result_file_regex", "")
+            self.errorView.settings().set("result_line_regex", "")
+            self.errorView.settings().set("result_base_dir", "")
+            self.window.get_output_panel("exec")
+
             self.window.run_command("save")
             wasShowing = False
             for theView in self.window.views():
