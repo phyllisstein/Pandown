@@ -346,7 +346,8 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
                         for items in v:
                             cmd.append("--variable=" + str(k) + ":" + str(items))
                     else:
-                        cmd.append("--variable=" + str(k) + ":" + str(v))
+                        if v != False:
+                            cmd.append("--variable=" + str(k) + ":" + str(v))
             if s["no_wrap"]:
                 cmd.append("--no-wrap")
             if s["columns"] > 0:

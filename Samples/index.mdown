@@ -1,0 +1,107 @@
+% Custom Templates
+% Daniel Shannon
+% 2012-12-06
+
+Pandoc Custom Templates with Pandown: A Primer
+==============================================
+Thank you for installing [Pandown for Sublime Text 2][pandown]! You've taken the first steps towards producing some sublime documents indeed. This guide is meant to serve a few different purposes: first, it's a quick-and-dirty introduction to building your own Pandoc templates for Pandown; second, it's an object-lesson in integrating Pandoc templates into Pandown, containing as it does every step in the process of getting from Markdown to output; and finally, it's a self-contained theme in its own right.
+
+[Brett Terpstra][brett] has been kind enough to allow one of his stylesheets for [Marked](http://markedapp.com) to be distributed with Pandown; when you build `index.mdown`, it will generate an HTML file that includes his CSS and some basic HTML to wrap your Markdown in it. If you copy `github.html` to `~/.pandoc/templates/`, you can always pass it to Pandoc as a template file.
+
+Indeed, you could do that right now and not bother with the rest of this document---no fuss, no muss. But you'd be missing out on all the excitement: Pandoc includes a number of simple but powerful ways of customizing your templates to suit your particular needs, and Pandown supports them fully.
+
+
+Working with Variables
+----------------------
+Pandoc templates can be customized on the fly by defining certain variables in the command-line arguments. Some of these are built in; the ones you'll use most often with Markdown are:
+
+`header-includes`
+ :    This reads the contents of a file verbatim into the template, usually just before the `</head>` tag.
+        You can set it in Pandown by configuring the value of `include_in_header`, which should be set to a list
+        (that is, even if it's one item, it should be enclosed in brackets, and multiple items can be included)
+        of filenames or paths.
+`include-before`
+ :    This inserts the contents of a file verbatim, usually just after the `<body>` tag. You can set it in Pandown
+        by configuring the value of `include_before`, which should be set to a list of filenames or paths.
+`include-after`
+ :    This copies the contents of a file into the template, usually just before the `</body>` tag. You can set it in
+        Pandown by configuring the value of `include_after`, which takes a list of filenames or paths.
+`css`
+ :    A variable used to link to one or more stylesheets rather than insert them. For each item in Pandown's `css`
+        list, a `<link>` tag is generated that points to the supplied URI.
+
+You can retrieve these variables in the template file by enclosing them in dollar signs, like this: `$css$`. To check whether a variable is defined, use a conditional statement with the format:
+
+    $if(variable)$
+        This will be inserted into the document; it may include the $variable$ itself.
+    $else$
+        This will be inserted into the document, but should probably not include the variable.
+    $endif$
+
+Since each of the default variables can take multiple values, you should access them with `$for$`, which uses much the same format as `$if$`:
+
+    $for(variable)$
+        Do something with each instance of $variable$.
+    $endfor$
+
+In addition, three variables are set on a per-document basis by its title block. This consists of three lines at the beginning of each file that are interpreted as defining the title, author or authors, and date of the document, and map to `$pagetitle$`, `$author-meta$`, and `$date-meta$`, respectively.
+
+Customizing Variables
+---------------------
+Pandoc also allows you to define arbitrary variables in the command line, so of course, Pandown does too. Under `pandoc_arguments`, set the dictionary `variables` to whatever keys and values you like. Values can even be lists, allowing you to completely duplicate the built-in functionality. For example, the `github.html` template is set up to work with the variable `javascript`. The template has these three lines:
+
+`````````````````````````````````````````````` {.html .numberLines}
+$for(javascript)$
+    <script type="text/javascript" src="$javascript$"></script>
+    <!-- Will be repeated for each javascript variable. -->
+$endfor$
+`````````````````````````````````````````````````````````````````````````````
+
+So if you include something like this in one of your configuration files, it'll be passed to the template:
+
+`````````````````````````````````````````````` {.json .numberLines}
+{
+    "pandoc_arguments":
+    {
+        "variables":
+        {
+            "javascript": ["jquery.js", "jqueryui.js"]
+        }
+    }
+}
+`````````````````````````````````````````````````````````````````````````````
+
+This potentially has some interesting uses. Let's say you had one template that you were using across several projects, and you wanted to include Google Analytics code appropriate for each project. You could accomplish this in a few different ways:
+
+
+1. **Set `include_after_body` in one of your Sublime settings files.**
+
+    Set it to something like `ga.html` and drop a corresponding file in your build directory. The only problem?
+    Pandoc will throw an error if you ever forget to include the file or override the setting. So if you use Pandoc
+    for things you don't want Google analyzing, this'll get a little inconvenient.
+
+2. **Set `include_after_body` for each project.**
+
+    This is a better solution, but requires you to be constantly copying and pasting the file that contains the
+    Analytics code into your new projects, changing the account ID and domain name each time. So if you're the sort of
+    person who keeps a lot of irons in any one fire, you'll get tired of this.
+
+3. **Use variables.**
+
+    I like this idea best, and in fact it's what this template implements as a demonstration. If you look at the very end of
+    the `github.html` file, you'll see the standard Google Analytics JavaScript; but instead of a predefined account ID,
+    there's the template variable `analytics-account`, and instead of a predefined domain, there's the variable
+    `analytics-domain`. Set these in the `pandoc-config.json` file, and the code you need will be included; don't, and nothing
+    happens. Thanks to nested `$if$`s, it'll even insert a comment gently reminding you to include the domain if you forget.
+
+You could conceivably extend this basic solution in any number of ways.
+
+You can also simply set a variable to `true` if you want to toggle parts of your code on and off. In this template, you can change the way the syntax highlighting looks by setting the variable `pygments` to `true`. By default, highlighting designed by [Brett] to mimic the look of GitHub is used; turning `pygments` on will switch it to [Pygments](http://www.pygments.org)' built-in style.
+
+Go Forth
+---------
+The `github.html` file is totally self-contained. If you want to use it as a template, place it in `~/.pandoc/templates/`, in one of your project folders, or in one of your `includes_paths`, and set the `template` argument to `github.html`. Tinker with it as you will! The syntax highlighting CSS in particular needs a great deal of work, because Pandoc assigns different classes to the syntactic items than do Brett and Pygments. It'd be appreciated if you left the comments crediting Brett, and the Pygments team, and me intact in any files that you generate from this template.
+
+
+[pandown]: http://sublime.daniel.sh/pandown/ "Pandown home"
+[brett]: http://brettterpstra.com "brettterpstra.com"
