@@ -180,6 +180,7 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
         # Order of preference should be: working DIR, project DIRs, then includes_paths,
         # then finally giving up and passing the filename to Pandoc.
 
+        debug("Looking for " + lookFor)
         # Did the user pass a specific file?
         tryAbs = os.path.abspath(os.path.expanduser(lookFor))
         if os.path.isfile(tryAbs):
@@ -205,10 +206,15 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
             (garbage, localName) = os.path.split(self.workingDIR)
             for folder in allFolders:
                 for root, dirs, files in os.walk(folder, topdown=False):
+                    (garbage, rootTail) = os.path.split(root)
+                    if rootTail == localName:
+                        topLevel = root
+                        break
                     for name in dirs:
                         debug("name: " + name)
                         if name == localName:
                             topLevel = folder
+                            break
             debug("topLevel: " + topLevel)
             checkDIR = self.workingDIR
             debug("Initial checkDIR: " + checkDIR)
@@ -217,11 +223,11 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
                 if os.path.exists(fileToCheck):
                     debug("It's in the project! Returning %s." % fileToCheck)
                     return prepend + fileToCheck if prepend else fileToCheck
+                    break
+                if checkDIR == topLevel:
+                    break
                 else:
-                    if checkDIR == topLevel:
-                        break
-                    else:
-                        checkDIR = os.path.abspath(os.path.join(checkDIR, os.path.pardir))
+                    checkDIR = os.path.abspath(os.path.join(checkDIR, os.path.pardir))
 
         # Is the file in the includes_paths?
         for pathToCheck in self.includes_paths:
