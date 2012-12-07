@@ -46,7 +46,8 @@
 		// "Speficy the base level for headers"
 		"base_header_level": 1,
 
-		// Apply code classes to all indented code blocks.
+		// Apply code classes to all indented code blocks. N.B.: Does not
+		// apply to fenced code, which must still be configured inline.
 		// MUST BE DEFINED AS A LIST, EVEN IF EMPTY. This is correct:
 		//		"indented_code_classes": [],
 		// and so is this:
@@ -122,7 +123,7 @@
 		"ascii": false,
 
 		// When outputting Markdown, use reference-style links (e.g. [go here!][1])
-		// rather than inline (e.g. [do here!](http://place.the) ).
+		// rather than inline (e.g. [go here!](http://place.the) ).
 		"reference_links": false,
 
 		// Force use of ATX-style headers ("# H1", "## H2", etc.) in output.

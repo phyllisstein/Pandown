@@ -26,9 +26,9 @@ And this feature is extra-configurable: once you're familiar enough with the Pan
 Currently, only arguments to Pandoc will be recognized in per-project configuration files.
 
 ### Templates
-The basic template from which Pandoc generates its HTML is just that: basic. And not very attractive. Without much trouble, you can do better on your own. For a non-designer and non-coder type, the templates included with Brett Terpstra's [Marked](http://markedapp.com) app are probably worth taking a look at; run an empty Markdown file through Marked and save it as HTML to get something that can become a lovely template file. (Brett has kindly made uncompressed versions of his CSS [available here](http://support.markedapp.com/kb/how-to-tips-and-tricks/writing-custom-css-for-marked).)
+The basic template from which Pandoc generates its HTML is just that: basic. And not very attractive. Without much trouble, you can do better on your own. For a non-designer and non-coder type, the stylesheets included with [Brett Terpstra](http://brettterpstra.com)'s wonderful [Marked](http://markedapp.com) app are probably worth taking a look at; run an empty Markdown file through Marked and save it as HTML to get something that can become a lovely template file. (Brett has kindly made uncompressed versions of his CSS [available here](http://support.markedapp.com/kb/how-to-tips-and-tricks/writing-custom-css-for-marked).)
 
-Consult the files in `Packages/Pandown/Samples` for a quickstart guide to building custom template files. The guide consists of a sample Markdown file, a sample template, a sample Pandoc configuration JSON, and the output HTML file generated from all those.
+Even more kindly, Brett has given the go-ahead for one of those templates to be distributed with this package. Consult the files in `Packages/Pandown/Samples` for a quickstart guide to building custom template files. The guide consists of a sample Markdown file, a sample template, a sample Pandoc configuration JSON, and the output HTML file generated from all those. Once you've played around with these files, you can use them for your own projects, too.
 
 ### Build Systems
 In theory, the build command syntax supports all of Pandoc's possible `from` and `to` formats. In practice, I am but one man and haven't written and tested `sublime-build` settings for each and every one of them. Markdown is completely configured from the get-go, but if you wish to use another input language you'll need to write a `sublime-build` file. At minimum, it must contain the following:
@@ -43,7 +43,7 @@ If the output file is not a type that Sublime can open, setting `prevent_viewing
 If you have any difficulties with or suggestions for Pandown, please don't hesitate to get in touch. You can use the GitHub "Issues" interface, or send an e-mail to Daniel at <d@daniel.sh>.
 
 ## Thanks and Credits
-The bare bones of the code were originally a modification of [Pandoc (Markdown)](https://github.com/jclement/SublimePandoc); though not much of what was there has survived, I'm grateful for the springboard. Almost all of the process-management code is from the `Defaults/exec.py` library. The package includes Gerald Storer's `minify_json` library, which is distributed under the MIT license and is obtainable [here](https://github.com/getify/JSON.minify). Thanks to Gerald for working around Python's (and Douglas Crockford's) obdurate refusal to allow comments in JSON.
+The bare bones of the code were originally a modification of [Pandoc (Markdown)](https://github.com/jclement/SublimePandoc); though not much of what was there has survived, I'm grateful for the springboard. Almost all of the process-management code is from the `Defaults/exec.py` library. The package includes Gerald Storer's `minify_json` library, which is distributed under the MIT license and is obtainable [here](https://github.com/getify/JSON.minify). Thanks to Gerald for working around Python's (and Douglas Crockford's) obdurate refusal to allow comments in JSON. [Brett Terpstra](http://brettterpstra.com)'s generous permission to include his CSS with this package is appreciated above all.
 
 
 
