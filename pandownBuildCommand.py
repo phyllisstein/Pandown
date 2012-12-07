@@ -1,9 +1,11 @@
 import sublime
 import sublime_plugin
 import os
+import time
 import subprocess
 import json
 import minify_json
+import tempfile
 import pandownProcess
 
 
@@ -21,6 +23,9 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
 
         self.view = self.window.active_view()
 
+        global DEBUG_MODE
+        DEBUG_MODE = self._getSetting("PANDOWN_DEBUG", False)
+
         if self.view.encoding() == "UTF-8" or self.view.encoding() == "Undefined":
             self.encoding = "utf-8"
         else:
@@ -30,18 +35,34 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
 
         self.inFile = self.view.file_name()
 
-        self.workingDIR = os.path.dirname(self.inFile)
-        os.chdir(self.workingDIR)
+        if self.inFile == None:
+            self.toWindow = True
+            self.fromDirty = False
+            self.workingDIR = ""
+            self.workingTemp = tempfile.NamedTemporaryFile("w+", delete=False)
+            buff = self.view.substr(sublime.Region(0, self.view.size()))
+            self.workingTemp.write(buff)
+            self.workingTemp.close()
+            self.inFile = self.workingTemp.name
+        elif self.view.is_dirty():  # There is a file, but it's dirty
+            self.toWindow = True
+            self.fromDirty = True
+            self.workingDIR = os.path.dirname(self.inFile)
+            os.chdir(self.workingDIR)
+            self.workingTemp = tempfile.NamedTemporaryFile("w+", delete=False)
+            buff = self.view.substr(sublime.Region(0, self.view.size()))
+            self.workingTemp.write(buff)
+            self.workingTemp.close()
+            self.tempLoc = self.workingTemp.name
+        else:
+            self.workingDIR = os.path.dirname(self.inFile)
+            os.chdir(self.workingDIR)
+            self.shouldOpen = True if ((self._getSetting("always_open", False) or do_open) and not prevent_viewing) else False
+            self.shouldDisplay = True if (self._getSetting("always_display", False) and not prevent_viewing) else False
+            self.fromDirty = False
+            self.makePDF = flag_pdf
+            self.toWindow = to_window
 
-        global DEBUG_MODE
-        DEBUG_MODE = self._getSetting("PANDOWN_DEBUG", False)
-
-        self.shouldOpen = True if ((self._getSetting("always_open", False) or do_open) and not prevent_viewing) else False
-
-        self.shouldDisplay = True if (self._getSetting("always_display", False) and not prevent_viewing) else False
-
-        self.makePDF = flag_pdf
-        self.toWindow = to_window
         self.includes_paths = self._getSetting("includes_paths", [])
         if not isinstance(self.includes_paths, list):
             sublime.error_message("Pandown: includes_paths should be a list, or not set.")
@@ -94,7 +115,7 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
             self.errorView.settings().set("result_base_dir", "")
             self.window.get_output_panel("exec")
 
-            self.window.run_command("save")
+            # self.window.run_command("save")
             wasShowing = False
             for theView in self.window.views():
                 if "Pandoc Output: " in theView.name():
@@ -121,7 +142,10 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
                 self.theListener.append_data_error(None, "[path: " + str(env['PATH']) + "]\n")
             self.theListener.append_data_error(None, "[Finished]")
 
-            outView.set_name("Pandoc Output: " + os.path.split(self.inFile)[1])
+            if not hasattr(self, "workingTemp") or self.fromDirty:
+                outView.set_name("Pandoc Output: " + os.path.split(self.inFile)[1])
+            else:
+                outView.set_name("Pandoc Output: " + time.strftime("%X on %x"))
 
     def is_enabled(self, kill=False):
         if kill:
@@ -250,12 +274,16 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
     def _buildPandocCmd(self, inFile, to, pandoc_from, a):
         cmd = ['pandoc']
 
-        if self.makePDF:
+        if self.fromDirty:
+            cmd.append("--from=" + pandoc_from)
+            cmd.append("--to=" + to[0])
+            inFile = self.tempLoc
+        elif self.toWindow:
+            pass
+        elif self.makePDF:
             self.outFile = os.path.splitext(inFile)[0] + ".pdf"
             cmd.append("--output=" + self.outFile)
             cmd.append("--from=" + pandoc_from)
-        elif self.toWindow:
-            pass
         else:
             self.outFile = os.path.splitext(inFile)[0] + to[1]
             cmd.append("--output=" + self.outFile)
