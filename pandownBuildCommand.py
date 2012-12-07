@@ -21,7 +21,7 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
 
         self.view = self.window.active_view()
 
-        if self.view.encoding() == "UTF-8" or self.view.encoding() == "Unknown":
+        if self.view.encoding() == "UTF-8" or self.view.encoding() == "Undefined":
             self.encoding = "utf-8"
         else:
             sublime.error_message("Error: Pandoc requires UTF-8.")
@@ -209,12 +209,10 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
                     (garbage, rootTail) = os.path.split(root)
                     if rootTail == localName:
                         topLevel = root
-                        break
                     for name in dirs:
                         debug("name: " + name)
                         if name == localName:
                             topLevel = folder
-                            break
             debug("topLevel: " + topLevel)
             checkDIR = self.workingDIR
             debug("Initial checkDIR: " + checkDIR)
