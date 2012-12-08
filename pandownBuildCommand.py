@@ -210,11 +210,6 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
         if os.path.isfile(tryAbs):
             debug("It's a path! Returning.")
             return prepend + tryAbs if prepend else tryAbs
-        # Are there no paths to check? Don't do this if we're looking for the config file,
-        # which doesn't need includes_paths to work.
-        if self.includes_paths_len == 0 and lookFor != "pandoc-config.json":
-            debug("No includes paths to check. Returning the input for Pandoc to handle.")
-            return prepend + lookFor if prepend else lookFor
 
         # Is the file in the current build directory?
         tryWorking = os.path.join(self.workingDIR, lookFor)
@@ -245,12 +240,15 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
                 if os.path.exists(fileToCheck):
                     debug("It's in the project! Returning %s." % fileToCheck)
                     return prepend + fileToCheck if prepend else fileToCheck
-                    break
                 if checkDIR == topLevel:
                     break
                 else:
                     checkDIR = os.path.abspath(os.path.join(checkDIR, os.path.pardir))
 
+        # Are there no paths to check?
+        if self.includes_paths_len == 0:
+            debug("No includes paths to check. Returning the input for Pandoc to handle.")
+            return prepend + lookFor if prepend else lookFor
         # Is the file in the includes_paths?
         for pathToCheck in self.includes_paths:
             pathToCheck = os.path.abspath(pathToCheck)
