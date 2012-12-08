@@ -6,17 +6,21 @@ import shutil
 
 class pandownTouchProjectConfigCommand(sublime_plugin.WindowCommand):
     def run(self):
-        configFile = os.path.join(os.path.dirname(self.window.active_view().file_name()), 'pandoc-config.json')
+        if self.view.file_name():
+            configFile = os.path.join(os.path.dirname(self.window.active_view().file_name()), 'pandoc-config.json')
+        else:
+            sublime.status_message("Cannot create project configuration for unsaved files.")
+            return
 
         if os.path.exists(configFile):
             self.window.open_file(configFile)
             return
 
-        defaultConfigFile = os.path.join(sublime.packages_path(), 'Pandown', 'default-pandoc-config.json')
+        defaultConfigFile = os.path.join(sublime.packages_path(), 'Pandown', '.default-pandoc-config-plain.json')
         userConfigFile = os.path.join(sublime.packages_path(), 'User', 'pandoc-config.json')
         if not os.path.exists(defaultConfigFile) and not os.path.exists(userConfigFile):
             sublime.status_message("Could not find default Pandoc configuration.")
-            print "[Pandown stores default configuration information in Projects/Pandown/.default-pandoc-config.json.]"
+            print "[Pandown stores default configuration information in Projects/Pandown/.default-pandoc-config-plain.json.]"
             print "[If this file has been moved or deleted, please reinstall Pandown.]"
             print "[See the README for support information.]"
             return
