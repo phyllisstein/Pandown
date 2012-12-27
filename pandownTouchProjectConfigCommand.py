@@ -6,7 +6,7 @@ import shutil
 
 class pandownTouchProjectConfigCommand(sublime_plugin.WindowCommand):
     def run(self):
-        if self.view.file_name():
+        if self.window.active_view().file_name():
             configFile = os.path.join(os.path.dirname(self.window.active_view().file_name()), 'pandoc-config.json')
         else:
             sublime.status_message("Cannot create project configuration for unsaved files.")

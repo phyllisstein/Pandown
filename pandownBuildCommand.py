@@ -246,7 +246,7 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
                     checkDIR = os.path.abspath(os.path.join(checkDIR, os.path.pardir))
 
         # Are there no paths to check?
-        if self.includes_paths_len == 0:
+        if self.includes_paths_len == 0 and lookFor != "pandoc-config.json":
             debug("No includes paths to check. Returning the input for Pandoc to handle.")
             return prepend + lookFor if prepend else lookFor
         # Is the file in the includes_paths?
