@@ -351,9 +351,9 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
                 pandoc_from += "-implicit_header_references"
 
             if s["blank_line_before_blockquote"]:
-                pandoc_from += "+blank_line_before_blockquote"
+                pandoc_from += "+blank_before_blockquote"
             else:
-                pandoc_from += "-blank_line_before_blockquote"
+                pandoc_from += "-blank_before_blockquote"
 
             if s["fenced_code_blocks"]:
                 pandoc_from += "+fenced_code_blocks"
