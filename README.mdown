@@ -1,7 +1,7 @@
 # Pandown Plugin for Sublime Text 2
 
 ## Introduction
-This package is designed as a complete, versatile, and highly Subliminal [Sublime Text 2](http://sublimetext.com/) build wrapper for [Pandoc][] **version 1.10 or higher**. Written by [Daniel Shannon][http://daniel.sh] and inspired by jclement's [Pandoc (Markdown)](https://github.com/jclement/SublimePandoc) plugin, Pandown is intended to be simple and understandable out of the box but highly customizable behind the scenes. All Pandoc options are configurable, and all input and output formats are theoretically supported, with [Markdown][] implemented most completely.
+This package is designed as a complete, versatile, and highly Subliminal [Sublime Text 2](http://sublimetext.com/) build wrapper for [Pandoc][] **version 1.10 or higher**. Written by [Daniel Shannon](http://daniel.sh) and inspired by jclement's [Pandoc (Markdown)](https://github.com/jclement/SublimePandoc) plugin, Pandown is intended to be simple and understandable out of the box but highly customizable behind the scenes. All Pandoc options are configurable, and all input and output formats are theoretically supported, with [Markdown][] implemented most completely.
 
 
 ## Installation
