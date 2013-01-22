@@ -12,3 +12,9 @@ MINOR FIXES
 	* UTF-8 characters that were bewildering
 	  Pandoc have been removed from the sample
 	  files and README.
+
+KNOWN ISSUES
+	* Pandoc seems to be having trouble with
+	  code blocks fenced with backticks. You
+	  may need to switch to tildes until this
+	  is corrected.

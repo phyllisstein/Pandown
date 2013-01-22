@@ -50,16 +50,16 @@ Customizing Variables
 ---------------------
 Pandoc also allows you to define arbitrary variables in the command line, so of course, Pandown does too. Under `pandoc_arguments`, set the dictionary `variables` to whatever keys and values you like. Values can even be lists, allowing you to completely duplicate the built-in functionality. For example, the `github.html` template is set up to work with the variable `javascript`. The template has these three lines:
 
-`````````````````````````````````````````````` {.html .numberLines}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.html .numberLines}
 $for(javascript)$
     <script type="text/javascript" src="$javascript$"></script>
     <!-- Will be repeated for each javascript variable. -->
 $endfor$
-`````````````````````````````````````````````````````````````````````````````
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 So if you include something like this in one of your configuration files, it'll be passed to the template:
 
-`````````````````````````````````````````````` {.json .numberLines}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.json .numberLines}
 {
     "pandoc_arguments":
     {
@@ -69,7 +69,7 @@ So if you include something like this in one of your configuration files, it'll 
         }
     }
 }
-`````````````````````````````````````````````````````````````````````````````
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This potentially has some interesting uses. Let's say you had one template that you were using across several projects, and you wanted to include Google Analytics code appropriate for each project. You could accomplish this in a few different ways:
 
