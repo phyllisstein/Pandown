@@ -310,6 +310,9 @@
 		// with numerical HTML entities.
 		"ascii": false,
 
+		// Use <q> tags in HTML5 output.
+		"html_q_tags": false,
+
 		// When outputting Markdown, use reference-style links (e.g. [go here!][1])
 		// rather than inline (e.g. [go here!](http://place.the) ).
 		"reference_links": false,
