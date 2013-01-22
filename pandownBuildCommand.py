@@ -521,9 +521,9 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
                 pandoc_from += "-abbreviations"
 
             if s["autolink_bare_urls"]:
-                pandoc_from += "+autolink_bare_urls"
+                pandoc_from += "+autolink_bare_uris"
             else:
-                pandoc_from += "-autolink_bare_urls"
+                pandoc_from += "-autolink_bare_uris"
 
             if s["link_attributes"]:
                 pandoc_from += "+link_attributes"
