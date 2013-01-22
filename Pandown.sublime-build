@@ -75,6 +75,14 @@
 		  "pandoc_to": ["epub", ".epub"],
 		  "prevent_viewing": true
 		},
+		{ "name": "Pandown: EPUB3",
+		  "pandoc_to": ["epub", ".epub"],
+		  "prevent_viewing": true
+		},
+		{ "name": "Pandown: FictionBooks 2",
+		  "pandoc_to": ["fb2", ".fb2"],
+		  "prevent_viewing": true
+		},
 		{ "name": "Pandown: AsciiDoc",
 		  "pandoc_to": ["asciidoc", ".txt"]
 		},

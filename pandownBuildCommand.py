@@ -272,22 +272,6 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
     def _buildPandocCmd(self, inFile, to, pandoc_from, a):
         cmd = ['pandoc']
 
-        if self.fromDirty:
-            cmd.append("--from=" + pandoc_from)
-            cmd.append("--to=" + to[0])
-            inFile = self.tempLoc
-        elif self.toWindow:
-            pass
-        elif self.makePDF:
-            self.outFile = os.path.splitext(inFile)[0] + ".pdf"
-            cmd.append("--output=" + self.outFile)
-            cmd.append("--from=" + pandoc_from)
-        else:
-            self.outFile = os.path.splitext(inFile)[0] + to[1]
-            cmd.append("--output=" + self.outFile)
-            cmd.append("--to=" + to[0])
-            cmd.append("--from=" + pandoc_from)
-
         try:
             f = open(os.path.join(sublime.packages_path(), 'Pandown', '.default-pandoc-config-plain.json'))
         except IOError as e:
@@ -339,11 +323,239 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
             s["css"].extend(p.pop("css", []))
             s.update(p)
 
+        if pandoc_from == "markdown":
+            # Parse Pandoc Markdown extensions
+            if s["escaped_line_breaks"]:
+                pandoc_from += "+escaped_line_breaks"
+            else:
+                pandoc_from += "-escaped_line_breaks"
+
+            if s["blank_before_header"]:
+                pandoc_from += "+blank_before_header"
+            else:
+                pandoc_from += "-blank_before_header"
+
+            if s["header_attributes"]:
+                pandoc_from += "+header_attributes"
+            else:
+                pandoc_from += "-header_attributes"
+
+            if s["auto_identifiers"]:
+                pandoc_from += "+auto_identifiers"
+            else:
+                pandoc_from += "-auto_identifiers"
+
+            if s["implicit_header_references"]:
+                pandoc_from += "+implicit_header_references"
+            else:
+                pandoc_from += "-implicit_header_references"
+
+            if s["blank_line_before_blockquote"]:
+                pandoc_from += "+blank_line_before_blockquote"
+            else:
+                pandoc_from += "-blank_line_before_blockquote"
+
+            if s["fenced_code_blocks"]:
+                pandoc_from += "+fenced_code_blocks"
+            else:
+                pandoc_from += "-fenced_code_blocks"
+
+            if s["line_blocks"]:
+                pandoc_from += "+line_blocks"
+            else:
+                pandoc_from += "-line_blocks"
+
+            if s["fancy_lists"]:
+                pandoc_from += "+fancy_lists"
+            else:
+                pandoc_from += "-fancy_lists"
+
+            if s["startnum"]:
+                pandoc_from += "+startnum"
+            else:
+                pandoc_from += "-startnum"
+
+            if s["definition_lists"]:
+                pandoc_from += "+definition_lists"
+            else:
+                pandoc_from += "-definition_lists"
+
+            if s["example_lists"]:
+                pandoc_from += "+example_lists"
+            else:
+                pandoc_from += "-example_lists"
+
+            if s["simple_tables"]:
+                pandoc_from += "+simple_tables"
+            else:
+                pandoc_from += "-simple_tables"
+
+            if s["multiline_tables"]:
+                pandoc_from += "+multiline_tables"
+            else:
+                pandoc_from += "-multiline_tables"
+
+            if s["grid_tables"]:
+                pandoc_from += "+grid_tables"
+            else:
+                pandoc_from += "-grid_tables"
+
+            if s["pipe_tables"]:
+                pandoc_from += "+pipe_tables"
+            else:
+                pandoc_from += "-pipe_tables"
+
+            if s["table_captions"]:
+                pandoc_from += "+table_captions"
+            else:
+                pandoc_from += "-table_captions"
+
+            if s["pandoc_title_block"]:
+                pandoc_from += "+pandoc_title_block"
+            else:
+                pandoc_from += "-pandoc_title_block"
+
+            if s["all_symbols_escapable"]:
+                pandoc_from += "+all_symbols_escapable"
+            else:
+                pandoc_from += "-all_symbols_escapable"
+
+            if s["intraword_underscores"]:
+                pandoc_from += "+intraword_underscores"
+            else:
+                pandoc_from += "-intraword_underscores"
+
+            if s["strikeout"]:
+                pandoc_from += "+strikeout"
+            else:
+                pandoc_from += "-strikeout"
+
+            if s["superscript"]:
+                pandoc_from += "+superscript"
+            else:
+                pandoc_from += "-superscript"
+
+            if s["subscript"]:
+                pandoc_from += "+subscript"
+            else:
+                pandoc_from += "-subscript"
+
+            if s["inline_code_attributes"]:
+                pandoc_from += "+inline_code_attributes"
+            else:
+                pandoc_from += "-inline_code_attributes"
+
+            if s["tex_math_dollars"]:
+                pandoc_from += "+tex_math_dollars"
+            else:
+                pandoc_from += "-tex_math_dollars"
+
+            if s["raw_html"]:
+                pandoc_from += "+raw_html"
+            else:
+                pandoc_from += "-raw_html"
+
+            if s["markdown_in_html_blocks"]:
+                pandoc_from += "+markdown_in_html_blocks"
+            else:
+                pandoc_from += "-markdown_in_html_blocks"
+
+            if s["raw_tex"]:
+                pandoc_from += "+raw_tex"
+            else:
+                pandoc_from += "-raw_tex"
+
+            if s["latex_macros"]:
+                pandoc_from += "+latex_macros"
+            else:
+                pandoc_from += "-latex_macros"
+
+            if s["implicit_figures"]:
+                pandoc_from += "+implicit_figures"
+            else:
+                pandoc_from += "-implicit_figures"
+
+            if s["footnotes"]:
+                pandoc_from += "+footnotes"
+            else:
+                pandoc_from += "-footnotes"
+
+            if s["inline_notes"]:
+                pandoc_from += "+inline_notes"
+            else:
+                pandoc_from += "-inline_notes"
+
+            if s["citations"]:
+                pandoc_from += "+citations"
+            else:
+                pandoc_from += "-citations"
+
+            if s["hard_line_breaks"]:
+                pandoc_from += "+hard_line_breaks"
+            else:
+                pandoc_from += "-hard_line_breaks"
+
+            if s["tex_math_single_backslash"]:
+                pandoc_from += "+tex_math_single_backslash"
+            else:
+                pandoc_from += "-tex_math_single_backslash"
+
+            if s["tex_math_double_backslash"]:
+                pandoc_from += "+tex_math_double_backslash"
+            else:
+                pandoc_from += "-tex_math_double_backslash"
+
+            if s["markdown_attribute"]:
+                pandoc_from += "+markdown_attribute"
+            else:
+                pandoc_from += "-markdown_attribute"
+
+            if s["mmd_title_block"]:
+                pandoc_from += "+mmd_title_block"
+            else:
+                pandoc_from += "-mmd_title_block"
+
+            if s["abbreviations"]:
+                pandoc_from += "+abbreviations"
+            else:
+                pandoc_from += "-abbreviations"
+
+            if s["autolink_bare_urls"]:
+                pandoc_from += "+autolink_bare_urls"
+            else:
+                pandoc_from += "-autolink_bare_urls"
+
+            if s["link_attributes"]:
+                pandoc_from += "+link_attributes"
+            else:
+                pandoc_from += "-link_attributes"
+
+            if s["mmd_header_identifiers"]:
+                pandoc_from += "+mmd_header_identifiers"
+            else:
+                pandoc_from += "-mmd_header_identifiers"
+
+
+
+        if self.fromDirty:
+            cmd.append("--from=" + pandoc_from)
+            cmd.append("--to=" + to[0])
+            inFile = self.tempLoc
+        elif self.toWindow:
+            pass
+        elif self.makePDF:
+            self.outFile = os.path.splitext(inFile)[0] + ".pdf"
+            cmd.append("--output=" + self.outFile)
+            cmd.append("--from=" + pandoc_from)
+        else:
+            self.outFile = os.path.splitext(inFile)[0] + to[1]
+            cmd.append("--output=" + self.outFile)
+            cmd.append("--to=" + to[0])
+            cmd.append("--from=" + pandoc_from)
+
         try:
             if s["data_dir"]:
                 cmd.append("--data-dir=" + s["data_dir"])
-            if s["markdown_strict"]:
-                cmd.append("--markdown-strict")
             if s["parse_raw"]:
                 cmd.append("--parse-raw")
             if s["smart"]:
@@ -417,6 +629,8 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
 
             if s["self_contained"]:
                 cmd.append("--self-contained")
+            if s["html_q_tags"]:
+                cmd.append("--html-q-tags")
             if s["ascii"]:
                 cmd.append("--ascii")
             if s["reference_links"]:

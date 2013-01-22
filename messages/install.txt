@@ -7,5 +7,7 @@ now's the time:
 
 http://johnmacfarlane.net/pandoc/
 
+Note that Pandown requires Pandoc
+1.10 or later to work correctly.
 As ever, it's not a bad idea to
 check out the README.mdown file.

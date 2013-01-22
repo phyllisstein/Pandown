@@ -1,14 +1,11 @@
-# [Pandown Plugin for Sublime Text 2][pandown]
-
-## Updates
-Thanks to Kyle L.'s diligence, I managed to catch a few silly bugs that I'd missed. The package should now perform much better than it did before---which is to say, the package should now perform.
+# Pandown Plugin for Sublime Text 2
 
 ## Introduction
-This package is designed as a complete, versatile, and highly Subliminal [Sublime Text 2](http://sublimetext.com/) build wrapper for [Pandoc][]. Written by [Daniel Shannon][pandown] and inspired by jclement's [Pandoc (Markdown)](https://github.com/jclement/SublimePandoc) plugin, Pandown is intended to be simple and understandable out of the box but highly customizable behind the scenes. All Pandoc options are configurable, and all input and output formats are theoretically supported, with [Markdown][] implemented most completely.
+This package is designed as a complete, versatile, and highly Subliminal [Sublime Text 2](http://sublimetext.com/) build wrapper for [Pandoc][] **version 1.10 or higher**. Written by [Daniel Shannon][http://daniel.sh] and inspired by jclement's [Pandoc (Markdown)](https://github.com/jclement/SublimePandoc) plugin, Pandown is intended to be simple and understandable out of the box but highly customizable behind the scenes. All Pandoc options are configurable, and all input and output formats are theoretically supported, with [Markdown][] implemented most completely.
 
 
 ## Installation
-Since this is just a build script, you'll need to download and install [Pandoc][] before it'll be of any use to you. The preferred installation method is through [Sublime Package Control](http://wbond.net/sublime_packages/package_control). Users sufficiently knowledgeable and persnickety to want to use another tactic are assumed to know what to do.
+Since this is just a build script, you'll need to download and install [Pandoc][] **version 1.10 or higher** before it'll be of any use to you. The preferred installation method is through [Sublime Package Control](http://wbond.net/sublime_packages/package_control). Users sufficiently knowledgeable and persnickety to want to use another tactic are assumed to know what to do.
 
 
 ## Usage
@@ -20,13 +17,13 @@ This is, of course, not very much fun: you wouldn't be using Sublime if you didn
 
 
 ### Configuration
-You'll find menu items for Pandown's configuration files under "Preferences→Package Settings→Pandown". The Default package settings file is heavily and informatively commented, making it an excellent place to start. Make what changes you'd like in the User settings, which override the defaults, and they'll be reflected on your next build. You can also override both the Default and User settings by changing the `settings` dictionary in your `sublime-project` file.
+You'll find menu items for Pandown's configuration files under "Preferences&rarr;Package Settings&rarr;Pandown". The Default package settings file is heavily and informatively commented, making it an excellent place to start. Make what changes you'd like in the User settings, which override the defaults, and they'll be reflected on your next build. You can also override both the Default and User settings by changing the `settings` dictionary in your `sublime-project` file.
 
-However, because it's inconvenient to constantly edit and reload the project file, even though so many of the arguments passed to Pandoc will change from project to project, Pandown features a third way to configure Pandoc. Clicking "Preferences→Package Settings→Pandown→Settings -- Project" or choosing "Pandown: Project Settings" in the Command Palette will place a file called `pandoc-config.json` in your current project folder. Setting the values for the `pandoc_arguments` dictionary there will override the settings in your project file _and_ the settings in your `sublime-settings` files. If a config file does not exist in the same folder as the file you're building, Pandown will check the folders above it until it reaches a main project folder---that is, config files apply to the folder they're placed in and all its subfolders.
+However, because it's inconvenient to constantly edit and reload the project file, even though so many of the arguments passed to Pandoc will change from project to project, Pandown features a third way to configure Pandoc. Clicking "Preferences&rarr;Package Settings&rarr;Pandown&rarr;Settings -- Project" or choosing "Pandown: Project Settings" in the Command Palette will place a file called `pandoc-config.json` in your current project folder. Setting the values for the `pandoc_arguments` dictionary there will override the settings in your project file _and_ the settings in your `sublime-settings` files. If a config file does not exist in the same folder as the file you're building, Pandown will check the folders above it until it reaches a main project folder---that is, config files apply to the folder they're placed in and all its subfolders.
 
 And this feature is extra-configurable: once you're familiar enough with the Pandoc options you care about to not need the complete set in each new project, you can place a `pandoc-config.json` file in your `Packages/User` folder and it, rather than the default file, will be copied. You can always delete it to restore the original behavior.
 
-Currently, only arguments to Pandoc will be recognized in per-project configuration files.
+Currently, only arguments to Pandoc and settings for Pandoc's Markdown extensions will be recognized in per-project configuration files.
 
 ### Templates
 The basic template from which Pandoc generates its HTML is just that: basic. And not very attractive. Without much trouble, you can do better on your own. For a non-designer and non-coder type, the stylesheets included with [Brett Terpstra](http://brettterpstra.com)'s wonderful [Marked](http://markedapp.com) app are probably worth taking a look at; run an empty Markdown file through Marked and save it as HTML to get something that can become a lovely template file. (Brett has kindly made uncompressed versions of his CSS [available here](http://support.markedapp.com/kb/how-to-tips-and-tricks/writing-custom-css-for-marked).)

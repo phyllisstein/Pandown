@@ -36,6 +36,171 @@
 	// the readme for information about configuring these options.
 	"pandoc_arguments":
 	{
+		/////////////////////////
+		// MARKDOWN EXTENSIONS //
+		/////////////////////////
+		// A backslash followed by a newline is also a line break.
+		"escaped_line_breaks": true,
+
+		// Require a blank line before a header.
+		"blank_before_header": true,
+
+		// Headers can be assigned attributes using this syntax at the end of
+		// the line containing the header text:
+		// {#identifier .class .class key=value key=value}
+		"header_attributes": true,
+
+		// A header without specified attributes will automatically be assigned
+		// a unique identifier based on the header text.
+		"auto_identifiers": true,
+
+		// Pandoc assumes header references have been defined for each header.
+		"implicit_header_references": true,
+
+		// Require a blank line before block quotes. In nested blockquotes,
+		// require:
+		// > Quotation
+		// >
+		// > > Quotation within quotation.
+		"blank_line_before_blockquote": true,
+
+		// Fence code blocks off with tildes or backticks.
+		"fenced_code_blocks": true,
+
+		// Start lines with pipe characters to and the division into lines and
+		// leading whitespace will be preserved. Useful for setting verse and
+		// addresses.
+		"line_blocks": true,
+
+		// Pandoc allows fancier numbering using uppercase letters, lowercase
+		// letters and Roman numerals. List markers may be enclosed in parentheses
+		// or followed by a single right-parenthesis or period, then two spaces.
+		"fancy_lists": true,
+
+		// Pandoc will pay attention to the starting number for each list.
+		"startnum": true,
+
+		// Pandoc supports definition lists; see documentation here for the
+		// correct syntax: http://johnmacfarlane.net/pandoc/README.html#definition-lists
+		"definition_lists": true,
+
+		// The list marker (@) can be used to sequentially number examples in
+		// a way that persists throughout the document.
+		"example_lists": true,
+
+		// Pandoc supports four kinds of tables, the syntax for which is given at:
+		// http://johnmacfarlane.net/pandoc/README.html#tables.
+		"simple_tables": true,
+		"multiline_tables": true,
+		"grid_tables": true,
+		"pipe_tables": true,
+
+		// A table caption is a paragraph beginning with the string "Table:" or a
+		// colon alone. It may be placed at the beginning or end of a table.
+		"table_captions": true,
+
+		// Pandoc allows the inclusion of a title block that will not appear in
+		// the body of the document:
+		// % Title
+		// % Author(s) (separated by semicolons)
+		// % Date
+		"pandoc_title_block": true,
+
+		// A backslash may be used to escape any Markdown symbol.
+		"all_symbols_escapable": true,
+
+		// Using underscores within a word for emphasis is disabled by
+		// default. Use * instead.
+		"intraword_underscores": false,
+
+		// To strike letters in your text, surround them with ~~two tildes~~.
+		"strikeout": true,
+
+		// Superscripts may be written by surrounding text with ^ characters,
+		// subscripts by surrounding text with ~ characters. Escape spaces within
+		// scripts using \ .
+		"superscript": true,
+		"subscript": true,
+
+		// Add attribtues, including syntax highlighting, to inline code.
+		"inline_code_attributes": true,
+
+		// Text between two $ characters will be rendered as LaTeX math.
+		"tex_math_dollars": true,
+
+		// The default behavior in Markdown allows you to insert raw HTML
+		// anywhere in a document.
+		"raw_html": true,
+
+		// By default, Pandoc interprets Markdown in blocks of HTML as Markdown.
+		// This deviates from Markdown.pl's default behavior.
+		"markdown_in_html_blocks": true,
+
+		// Pandoc allows raw TeX to be passed in addition to raw HTML.
+		"raw_tex": true,
+
+		// If set to `true`, Pandoc will use \newcommand and \renewcommand
+		// definitions in all LaTeX math blocks.
+		"latex_macros": true,
+
+		// An image occurring by itself in a paragraph will be rendered as a
+		// figure with a caption: ![This is the caption](path/to/image.jpg)
+		"implicit_figures": true,
+
+		// Pandoc will parse footnotes in the syntax listed here:
+		// http://johnmacfarlane.net/pandoc/README.html#footnotes
+		"footnotes": true,
+		"inline_notes": true,
+
+		// Use the syntax given here for citations:
+		// http://johnmacfarlane.net/pandoc/README.html#citations
+		"citations": true,
+
+		// All newlines within a paragraph will be interpreted as linebreaks
+		// rather than spaces.
+		"hard_line_breaks": false,
+
+		// Anything between \( and \) will be interpreted as TeX inline math,
+		// and anything between \[ and \] as TeX display math.
+		"tex_math_single_backslash": false,
+
+		// Same as above, but escaped with two backslashes.
+		"tex_math_double_backslash": false,
+
+		// Markdown is only parsed within block-level tags if `markdown=1` is
+		// set in their attributes.
+		"markdown_attribute": false,
+
+		// Enables a MultiMarkdown-style title block:
+		// Title:    My Title
+		// Author:   Arthur Author
+		// Date:     January 1, 2013
+		// Comment:  This is a mmd title block, and it even includes
+		//           a field spanning multiple lines.
+		"mmd_title_block": false,
+
+		// Skip PHP Markdown Extra abbreviation keys instead of parsing them
+		// as paragraphs if set to `true`.
+		"abbreviations": false,
+
+		// Makes all absolute URLs into links, even when not enclosed in <...>.
+		"autolink_bare_urls": false,
+
+		// Parse (but ignore, at the moment) MMD-style key--value attribtues
+		// in image and link references.
+		"link_attributes": false,
+
+		// Parses MMD-style header identifiers (in square brackets between header
+		// text and closing ATX #s.
+		"mmd_header_identifiers": false,
+
+
+
+
+
+		////////////////////////////
+		// COMMAND-LINE ARGUMENTS //
+		////////////////////////////
 		// Modify this setting to tell Pandoc to look for any of the following
 		// in the specified directory rather than ~/.pandoc or Pandoc's default
 		// directory tree. Note that this is not an all-purpose includes
@@ -49,13 +214,10 @@
 		//			slideous/
 		//			s5/
 		//			templates/
-		// Anything placed under templates and will be found by the "template"
+		// Anything placed under templates will be found by the "template"
 		// setting; otherwise, to set an include directory, use the "includes_paths"
-		// option above.
+		// option.
 		"data_dir": "",
-		
-		// Disable Pandoc's Markdown extensions.
-		"markdown_strict": false,
 
 		// "Parse untranslatable HTML codes and LaTeX environments as
 		// raw HTML or LaTeX, instead of ignoring them."
