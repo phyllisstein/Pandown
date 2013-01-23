@@ -69,6 +69,7 @@
 		"include_after_body": [],
 		"self_contained": false,
 		"ascii": false,
+		"html_q_tags": false,
 		"reference_links": false,
 		"atx_headers": false,
 		"chapters": false,
