@@ -18,7 +18,7 @@
                             {
                                 "command": "open_file", "args":
                                 {
-                                    "file": "${packages}/Pandown3/README.mdown"
+                                    "file": "${packages}/Pandown/README.mdown"
                                 },
                                 "caption": "README"
                             },
@@ -28,7 +28,7 @@
                             {
                                 "command": "open_file", "args":
                                 {
-                                    "file": "${packages}/Pandown3/Pandown.sublime-settings"
+                                    "file": "${packages}/Pandown/Pandown.sublime-settings"
                                 },
                                 "caption": "Settings – Default"
                             },
