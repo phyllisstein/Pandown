@@ -7,6 +7,7 @@
 import re
 import tempfile
 import codecs
+import sublime
 
 class PandownCriticPreprocessor:
     def deletionProcess(self, group_object):
@@ -70,11 +71,18 @@ class PandownCriticPreprocessor:
         with codecs.open(inFile, "r", "utf-8") as f:
             h = f.read()
 
-        h = re.sub(del_pattern, self.deletionProcess, h, flags=re.DOTALL)
-        h = re.sub(add_pattern, self.additionProcess, h, flags=re.DOTALL)
-        h = re.sub(comm_pattern, self.highlightProcess, h, flags=re.DOTALL)
-        h = re.sub(mark_pattern, self.markProcess, h, flags=re.DOTALL)
-        h = re.sub(subs_pattern, self.subsProcess, h, flags=re.DOTALL)
+        if int(sublime.version()) < 3000:
+            h = re.sub(del_pattern, self.deletionProcess, h)
+            h = re.sub(add_pattern, self.additionProcess, h)
+            h = re.sub(comm_pattern, self.highlightProcess, h)
+            h = re.sub(mark_pattern, self.markProcess, h)
+            h = re.sub(subs_pattern, self.subsProcess, h)
+        else:
+            h = re.sub(del_pattern, self.deletionProcess, h, flags=re.DOTALL)
+            h = re.sub(add_pattern, self.additionProcess, h, flags=re.DOTALL)
+            h = re.sub(comm_pattern, self.highlightProcess, h, flags=re.DOTALL)
+            h = re.sub(mark_pattern, self.markProcess, h, flags=re.DOTALL)
+            h = re.sub(subs_pattern, self.subsProcess, h, flags=re.DOTALL)
 
         workingTemp = tempfile.NamedTemporaryFile("w", delete=False)
         workingTemp.close()
