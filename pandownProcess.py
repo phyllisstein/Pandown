@@ -1,13 +1,15 @@
+from __future__ import print_function
 import sublime
+import sublime_plugin
 import time
 import os
 import subprocess
 import sys
-import thread
+import threading
 import functools
 
 
-class ProcessListener(object):
+class PandownProcessListener(object):
 
     def on_data_out(self, proc, data):
         pass
@@ -19,11 +21,11 @@ class ProcessListener(object):
         pass
 
 
-class AsyncProcess(object):
+class PandownAsyncProcess(object):
     def __init__(self, command, env, listener):
         self.listener = listener
         self.killed = False
-        self.startTime = time.time()
+        self.start_time = time.time()
 
         startupinfo = None
         if os.name == "nt":
@@ -32,15 +34,17 @@ class AsyncProcess(object):
 
         processEnvironment = os.environ.copy()
         processEnvironment.update(env)
-        for k, v in processEnvironment.items():
-            processEnvironment[k] = os.path.expandvars(v).encode(sys.getfilesystemencoding())
+        for k, v in list(processEnvironment.items()):
+            processEnvironment[k] = os.path.expandvars(v)
 
         self.process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, startupinfo=startupinfo, env=processEnvironment)
         if self.process.stdout:
-            thread.start_new_thread(self.read_stdout, ())
+            # _thread.start_new_thread(self.read_stdout, ())
+            threading.Thread(target=self.read_stdout).start()
 
         if self.process.stderr:
-            thread.start_new_thread(self.read_stderr, ())
+            # _thread.start_new_thread(self.read_stderr, ())
+            threading.Thread(target=self.read_stderr).start()
 
     def kill(self):
         if not self.killed:
@@ -58,7 +62,7 @@ class AsyncProcess(object):
         while True:
             data = os.read(self.process.stdout.fileno(), 2 ** 15)
 
-            if data != "":
+            if len(data) > 0:
                 if self.listener:
                     self.listener.on_data_out(self, data)
             else:
@@ -71,7 +75,7 @@ class AsyncProcess(object):
         while True:
             data = os.read(self.process.stderr.fileno(), 2 ** 15)
 
-            if data != "":
+            if len(data) > 0:
                 if self.listener:
                     self.listener.on_data_err(self, data)
             else:
@@ -81,162 +85,153 @@ class AsyncProcess(object):
                 break
 
 
-class pandownSTDIOListener(ProcessListener):
-    def __init__(self, caller, errorPanel, outputView):
-        self.caller = caller
-        self.err = errorPanel
-        self.view = outputView
-
-    def append_data_output(self, proc, data):
-        if proc != self.caller.buildProcess:
-            if proc:
-                proc.kill()
+class PandownExecCommand(sublime_plugin.WindowCommand, PandownProcessListener):
+    def run(self, cmd=None, env={}, file_regex="", line_regex="", encoding="utf-8", quiet=False, kill=False, word_wrap=True, syntax="Packages/Text/Plain text.tmLanguage", working_dir="", output_view=None, **kwargs):
+        __ST3 = int(sublime.version()) >= 3000
+        if kill:
+            if self.proc:
+                self.proc.kill()
+                self.proc = None
+                self.append_string_err(None, "[Cancelled]")
             return
 
+        if not output_view:
+            self.output_view = self.window.create_output_panel("exec") if __ST3 else self.window.get_output_panel("exec")
+            self.error_view = self.output_view
+            self.to_window = False
+        elif output_view != None:
+            for aView in self.window.views():
+                if aView.id() == output_view:
+                    self.output_view = aView
+            self.error_view = self.window.create_output_panel("exec") if __ST3 else self.window.get_output_panel("exec")
+            self.to_window = True
+
+        if (working_dir == "" and self.window.active_view() and self.window.active_view().file_name()):
+            working_dir = os.path.dirname(self.window.active_view().file_name())
+
+        self.error_view.settings().set("result_file_regex", "")
+        self.error_view.settings().set("result_line_regex", "")
+        self.error_view.settings().set("result_base_dir", working_dir)
+        self.error_view.settings().set("word_wrap", word_wrap)
+        self.error_view.settings().set("line_numbers", False)
+        self.error_view.settings().set("gutter", False)
+        self.error_view.settings().set("scroll_past_end", False)
+        if __ST3:
+            self.error_view.assign_syntax(syntax)
+        else:
+            self.error_view.set_syntax_file(syntax)
+
+        self.window.create_output_panel("exec") if __ST3 else self.window.get_output_panel("exec")
+
+        self.encoding = encoding
+        self.quiet = quiet
+
+        self.proc = None
+        if not self.quiet:
+            print("Running " + " ".join(cmd))
+        
+        sublime.status_message("Building")
+
+        show_panel_on_build = sublime.load_settings("Preferences.sublime-settings").get("show_panel_on_build", True)
+        if show_panel_on_build:
+            self.window.run_command("show_panel", {"panel": "output.exec"})
+
+        merged_env = env.copy()
+        if self.window.active_view():
+            user_env = self.window.active_view().settings().get("build_env")
+            if user_env:
+                merged_env.update(user_env)
+
+        if working_dir != "":
+            os.chdir(working_dir)
+
+        self.debug_text = ""
+        self.debug_text += "[cmd: " + str(cmd) + "]\n"
+        self.debug_text += "[dir: " + str(os.getcwd()) + "]\n"
+
+        if "PATH" in merged_env:
+            self.debug_text += "[path: " + str(merged_env["PATH"]) + "]"
+        else:
+            self.debug_text += "[path: " + str(os.environ["PATH"]) + "]"
+
         try:
-            theStr = data.decode(self.caller.encoding)
-        except:
-            theStr = "[Decode error: output not " + self.caller.encoding + "]\n"
-            proc = None
+            self.proc = PandownAsyncProcess(cmd, merged_env, self)
+        except Exception as e:
+            self.append_string_err(None, str(e) + "\n")
+            self.append_string_err(None, self.debug_text + "\n")
+            if not self.quiet:
+                self.append_string_err(None, "[Finished]")
 
-        theStr = theStr.replace('\r\n', '\n').replace('\r', '\n')
+    def is_enabled(self, kill=False):
+        if kill:
+            return hasattr(self, 'proc') and self.proc and self.proc.poll()
+        else:
+            return True
 
-        selection_was_at_end = (len(self.view.sel()) == 1
-                                and self.view.sel()[0] == sublime.Region(self.view.size()))
+    def append_string_err(self, proc, string):
+        self.append_data_error(proc, string.encode(self.encoding))
 
-        edit = self.view.begin_edit()
-        self.view.insert(edit, self.view.size(), theStr)
-        if selection_was_at_end:
-            self.view.show(self.view.size())
-        self.view.end_edit(edit)
-
-    def append_data_error(self, proc, data):
-        if proc != self.caller.buildProcess:
-            if proc:
-                proc.kill()
-            return
-
-        try:
-            theStr = data.decode(self.caller.encoding)
-        except:
-            theStr = "[Decode error: output not " + self.caller.encoding + "]\n"
-            proc = None
-
-        theStr = theStr.replace('\r\n', '\n').replace('\r', '\n')
-
-        selection_was_at_end = (len(self.err.sel()) == 1
-                                and self.err.sel()[0] == sublime.Region(self.err.size()))
-        self.err.set_read_only(False)
-        edit = self.err.begin_edit()
-        self.err.insert(edit, self.err.size(), theStr)
-        if selection_was_at_end:
-            self.err.show(self.err.size())
-        self.err.end_edit(edit)
-        self.err.set_read_only(True)
+    def append_string_out(self, proc, string):
+        self.append_data_output(proc, string.encode(self.encoding))
 
     def finish(self, proc):
-        elapsed = time.time() - proc.startTime
-        exit_code = proc.exit_code()
-        if exit_code == 0 or exit_code == None:
-            self.append_data_error(proc, ("[Finished in %.1fs]") % (elapsed))
-            smoothExit = True
-        else:
-            self.append_data_error(proc, ("[Finished in %.1fs with error code %d]") % (elapsed, exit_code))
-            smoothExit = False
+        if not self.quiet:
+            elapsed = time.time() - proc.start_time
+            exit_code = proc.exit_code()
+            if exit_code == 0 or exit_code == None:
+                self.append_string_err(proc, ("[Finished in %.1fs]" % (elapsed)))
+            else:
+                self.append_string_err(proc, ("[Finished in %.1fs with exit code %d]\n" % (elapsed, exit_code)))
 
-        if proc != self.caller.buildProcess:
+        if proc != self.proc:
             return
 
-        errs = self.err.find_all_results()
-        if len(errs) == 0 and smoothExit == True:
+        errs = self.error_view.find_all_results()
+        if len(errs) == 0:
             sublime.status_message("Build finished")
-        elif len(errs) == 0 and smoothExit == False:
-            sublime.status_message(("Build failed with error code %d") % exit_code)
         else:
-            sublime.status_message(("Build failed with %d errors") % len(errs))
+            sublime.status_message("Build finished with %d errors" % len(errs))
 
-        edit = self.err.begin_edit()
-        self.err.sel().clear()
-        self.err.sel().add(sublime.Region(0))
-        self.err.end_edit(edit)
+    def append_data_error(self, proc, data):
+        if proc != self.proc:
+            if proc:
+                proc.kill()
+            return
 
-        edit = self.view.begin_edit()
-        self.view.sel().clear()
-        self.view.sel().add(sublime.Region(0))
-        self.view.end_edit(edit)
+        try:
+            string = data.decode(self.encoding)
+        except:
+            string = "[Decode error: output not " + self.encoding + "]\n"
+            proc = None
+
+        string = string.replace("\r\n", "\n").replace("\r", "\n")
+
+        self.error_view.run_command("append", {"characters": string, "force": True})
+
+    def append_data_output(self, proc, data):
+        if proc != self.proc:
+            if proc:
+                proc.kill()
+            return
+
+        try:
+            string = data.decode(self.encoding)
+        except:
+            string = "[Decode error: output not " + self.encoding + "]\n"
+            proc = None
+
+        string = string.replace("\r\n", "\n").replace("\r", "\n")
+
+        self.output_view.run_command("append", {"characters": string, "force": True})
 
     def on_data_out(self, proc, data):
-        sublime.set_timeout(functools.partial(self.append_data_output, proc, data), 0)
+        if self.to_window == False:
+            sublime.set_timeout(functools.partial(self.append_data_error, proc, data), 0)
+        else:
+            sublime.set_timeout(functools.partial(self.append_data_output, proc, data), 0)
 
     def on_data_err(self, proc, data):
         sublime.set_timeout(functools.partial(self.append_data_error, proc, data), 0)
-
-    def on_finished(self, proc):
-        sublime.set_timeout(functools.partial(self.finish, proc), 0)
-
-
-class pandownDefaultListener(ProcessListener):
-    def __init__(self, caller, errorPanel):
-        self.caller = caller
-        self.err = errorPanel
-
-    def append_data(self, proc, data):
-        if proc != self.caller.buildProcess:
-            if proc:
-                proc.kill()
-            return
-
-        try:
-            theStr = data.decode(self.caller.encoding)
-        except:
-            theStr = "[Decode error: output not " + self.encoding + "]\n"
-            proc = None
-
-        theStr = theStr.replace('\r\n', '\n').replace('\r', '\n')
-
-        selection_was_at_end = (len(self.err.sel()) == 1
-                                and self.err.sel()[0] == sublime.Region(self.err.size()))
-        self.err.set_read_only(False)
-        edit = self.err.begin_edit()
-        self.err.insert(edit, self.err.size(), theStr)
-        if selection_was_at_end:
-            self.err.show(self.err.size())
-        self.err.end_edit(edit)
-        self.err.set_read_only(True)
-
-    def finish(self, proc):
-        elapsed = time.time() - proc.startTime
-        exit_code = proc.exit_code()
-        if exit_code == 0 or exit_code == None:
-            self.append_data(proc, ("[Finished in %.1fs]") % (elapsed))
-            smoothExit = True
-        else:
-            self.append_data(proc, ("[Finished in %.1fs with error code %d]") % (elapsed, exit_code))
-            smoothExit = False
-
-        if proc != self.caller.buildProcess:
-            return
-
-        errs = self.err.find_all_results()
-        if len(errs) == 0 and smoothExit == True:
-            sublime.status_message("Build finished")
-        elif len(errs) == 0 and smoothExit == False:
-            sublime.status_message(("Build failed with error code %d") % exit_code)
-        else:
-            sublime.status_message(("Build failed with %d errors") % len(errs))
-
-        edit = self.err.begin_edit()
-        self.err.sel().clear()
-        self.err.sel().add(sublime.Region(0))
-        self.err.end_edit(edit)
-
-        self.caller._openAndDisplay()
-
-    def on_data_out(self, proc, data):
-        sublime.set_timeout(functools.partial(self.append_data, proc, data), 0)
-
-    def on_data_err(self, proc, data):
-        sublime.set_timeout(functools.partial(self.append_data, proc, data), 0)
 
     def on_finished(self, proc):
         sublime.set_timeout(functools.partial(self.finish, proc), 0)

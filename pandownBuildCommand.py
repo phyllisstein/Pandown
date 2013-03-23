@@ -1,121 +1,115 @@
+from __future__ import print_function
 import sublime
+__ST3 = int(sublime.version()) >= 3000
 import sublime_plugin
 import os
 import time
 import subprocess
 import json
-import minify_json
+if __ST3:
+    import Pandown.minify_json
+    from Pandown.pandownCriticPreprocessor import *
+else:
+    import minify_json
+    from pandownCriticPreprocessor import *
 import tempfile
-import pandownProcess
-
+import re
 
 DEBUG_MODE = False
 
 
-def debug(theMessage, shouldLog=False):
+
+
+def debug(theMessage):
     if DEBUG_MODE:
-        print "[" + str(theMessage) + "]"
+        print("[Pandown: " + str(theMessage) + "]")
+
+def err(e):
+    print("[Pandown: " + str(e) + "]")
 
 
-class pandownBuildCommand(sublime_plugin.WindowCommand):
+class PandownBuildCommand(sublime_plugin.WindowCommand):
     def run(self, pandoc_from="", pandoc_to=["", ""], do_open=False, prevent_viewing=False, flag_pdf=False, to_window=False, **kwargs):
-        sublime.status_message("Building")
-
+        global DEBUG_MODE, __ST3
+        env = {}
         self.view = self.window.active_view()
+        s = sublime.load_settings("Pandown.sublime-settings")
+        user_env = s.get("build_env", None)
+        if user_env:
+            env.update(user_env)
+        env.update(os.environ.copy())
+        env['PATH'] = env['PATH'] + ":" + s.get("install_path", "/usr/local/bin") + ":" + s.get("texbin_path", "/usr/texbin")
 
-        global DEBUG_MODE
-        DEBUG_MODE = self._getSetting("PANDOWN_DEBUG", False)
+        if not self.checkPandoc(env):
+            sublime.error_message("Pandown requires Pandoc")
+            return
+
+        DEBUG_MODE = s.get("PANDOWN_DEBUG", False)
 
         if self.view.encoding() == "UTF-8" or self.view.encoding() == "Undefined":
             self.encoding = "utf-8"
         else:
             sublime.error_message("Error: Pandoc requires UTF-8.")
-            print "[Error: Current encoding is " + self.view.encoding() + "]"
+            err("Error: Current encoding is " + self.view.encoding())
             return
 
-        self.inFile = self.view.file_name()
+        inFile = self.view.file_name()
 
-        if self.inFile == None:
+        if inFile == None:
             self.toWindow = True
-            self.fromDirty = False
+            self.makePDF = False
             self.workingDIR = ""
-            self.workingTemp = tempfile.NamedTemporaryFile("w+", delete=False)
+            workingTemp = tempfile.NamedTemporaryFile("w+", delete=False)
             buff = self.view.substr(sublime.Region(0, self.view.size()))
-            self.workingTemp.write(buff)
-            self.workingTemp.close()
-            self.inFile = self.workingTemp.name
-        elif self.view.is_dirty():  # There is a file, but it's dirty
-            self.toWindow = True
-            self.fromDirty = True
-            self.workingDIR = os.path.dirname(self.inFile)
-            os.chdir(self.workingDIR)
-            self.workingTemp = tempfile.NamedTemporaryFile("w+", delete=False)
-            buff = self.view.substr(sublime.Region(0, self.view.size()))
-            self.workingTemp.write(buff)
-            self.workingTemp.close()
-            self.tempLoc = self.workingTemp.name
+            workingTemp.close()
+            with codecs.open(workingTemp.name(), "w+", "utf-8") as f:
+                f.write(buff)
+            inFile = workingTemp.name
+            self.shouldOpen = False
+            self.shouldDisplay = True
+            self.outFile = ""
         else:
-            self.workingDIR = os.path.dirname(self.inFile)
+            self.workingDIR = os.path.dirname(inFile)
             os.chdir(self.workingDIR)
-            self.shouldOpen = True if ((self._getSetting("always_open", False) or do_open) and not prevent_viewing) else False
-            self.shouldDisplay = True if (self._getSetting("always_display", False) and not prevent_viewing) else False
-            self.fromDirty = False
+            self.shouldOpen = True if ((s.get("always_open", False) or do_open) and not prevent_viewing) else False
+            self.shouldDisplay = True if (s.get("always_display", False) and not prevent_viewing) else False
             self.makePDF = flag_pdf
             self.toWindow = to_window
+            workingTemp = None
 
-        self.includes_paths = self._getSetting("includes_paths", [])
+        self.includes_paths = s.get("includes_paths", [])
         if not isinstance(self.includes_paths, list):
             sublime.error_message("Pandown: includes_paths should be a list, or not set.")
             sublime.status_message("Build failed")
             return
         self.includes_paths_len = len(self.includes_paths)
 
-        env = {}
-        user_env = self._getSetting("build_env", {})
-        if user_env:
-            env.update(user_env)
-        env.update(os.environ.copy())
-        env['PATH'] = env['PATH'] + ":" + self._getSetting("install_path", "/usr/local/bin") + ":" + self._getSetting("texbin_path", "/usr/texbin")
+        argDict = s.get("pandoc_arguments", None)
 
-        argDict = self._getSetting("pandoc_arguments", None)
-        cmd = self._buildPandocCmd(self.inFile, pandoc_to, pandoc_from, argDict)
+        if s.get("preprocess_critic", False):
+            preprocessor = PandownCriticPreprocessor()
+            self.origIn = inFile
+            self.criticized = True
+            inFile = preprocessor.preprocessCritic(inFile)
+        else:
+            self.criticized = False
+
+        cmd = self.buildPandocCmd(inFile, pandoc_to, pandoc_from, argDict)
 
         debug(cmd)
 
         if not cmd:
-            sublime.status_message("Build failed. See console for details.")
-            raise Exception("Error constructing Pandoc command.")
-
+            sublime.status_message("Build failed.")
+            sublime.error_message("Pandown: Error constructing Pandoc command.")
             return
 
         if sublime.load_settings("Preferences.sublime-settings").get("show_panel_on_build", True):
             self.window.run_command("show_panel", {"panel": "output.exec"})
 
         if not self.toWindow:
-            self.output_view = self.window.get_output_panel("exec")
-            self.output_view.settings().set("result_file_regex", "")
-            self.output_view.settings().set("result_line_regex", "")
-            self.output_view.settings().set("result_base_dir", "")
-            self.window.get_output_panel("exec")
-
-            errorType = OSError
-            try:
-                self.theListener = pandownProcess.pandownDefaultListener(self, self.output_view)
-                self.buildProcess = pandownProcess.AsyncProcess(cmd, env, self.theListener)
-            except errorType as e:
-                self.theListener.append_data(None, str(e) + "\n")
-                self.theListener.append_data(None, "[cmd: " + str(cmd) + "]\n")
-                self.theListener.append_data(None, "[dir: " + str(os.getcwdu()) + "]\n")
-                self.theListener.append_data(None, "[path: " + str(env['PATH']) + "]\n")
-            self.theListener.append_data(None, "[Finished]")
+            self.window.run_command("pandown_exec", {"cmd": cmd, "env": env})
+            self.openAndDisplay()
         else:
-            self.errorView = self.window.get_output_panel("exec")
-            self.errorView.settings().set("result_file_regex", "")
-            self.errorView.settings().set("result_line_regex", "")
-            self.errorView.settings().set("result_base_dir", "")
-            self.window.get_output_panel("exec")
-
-            # self.window.run_command("save")
             wasShowing = False
             for theView in self.window.views():
                 if "Pandoc Output: " in theView.name():
@@ -124,47 +118,32 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
                     wasShowing = True
                     break
             if not wasShowing:
-                self._splitWindowAndFocus()
-                outView = self.window.new_file()
-            edit = outView.begin_edit()
-            outView.erase(edit, sublime.Region(0, outView.size()))
-            outView.end_edit(edit)
-            self.buffView = outView
+                self.splitWindowAndFocus()
+                self.window.new_file()
+                outView = self.window.active_view()
+            outView.run_command("pandown_out_view_erase")
+            buffView = outView
 
-            errorType = OSError
-            try:
-                self.theListener = pandownProcess.pandownSTDIOListener(self, self.errorView, self.buffView)
-                self.buildProcess = pandownProcess.AsyncProcess(cmd, env, self.theListener)
-            except errorType as e:
-                self.theListener.append_data_error(None, str(e) + "\n")
-                self.theListener.append_data_error(None, "[cmd: " + str(cmd) + "]\n")
-                self.theListener.append_data_error(None, "[dir: " + str(os.getcwdu()) + "]\n")
-                self.theListener.append_data_error(None, "[path: " + str(env['PATH']) + "]\n")
-            self.theListener.append_data_error(None, "[Finished]")
+            self.window.run_command("pandown_exec", {"cmd": cmd, "env": env, "output_view": buffView.id()})
 
-            if not hasattr(self, "workingTemp") or self.fromDirty:
-                outView.set_name("Pandoc Output: " + os.path.split(self.inFile)[1])
+            if not workingTemp and not self.criticized:
+                outView.set_name("Pandoc Output: " + os.path.split(inFile)[1])
+            elif self.criticized:
+                outView.set_name("Pandoc Output: " + os.path.split(self.origIn)[1])
             else:
                 outView.set_name("Pandoc Output: " + time.strftime("%X on %x"))
 
-    def is_enabled(self, kill=False):
-        if kill:
-            return hasattr(self, 'buildProcess') and self.buildProcess and self.buildProcess.poll()
-        else:
-            return True
+    def checkPandoc(self, env):
+        cmd = ['pandoc', '--version']
+        try:
+            output = subprocess.check_call(cmd, env=env)
+        except Exception as e:
+            err("Exception: " + str(e))
+            return False
 
-    def _getSetting(self, theSetting, default):
-        viewSetting = self.view.settings().get(theSetting) if self.view.settings().has(theSetting) else None
-        packageSetting = sublime.load_settings("Pandown.sublime-settings").get(theSetting) if sublime.load_settings("Pandown.sublime-settings").has(theSetting) else None
-        shouldMerge = (getattr(viewSetting, "update", None)) and (getattr(packageSetting, "update", None))
-        if shouldMerge:
-            packageSetting.update(viewSetting)
-            return packageSetting
-        if not viewSetting and not packageSetting:
-            return default
-        return viewSetting if viewSetting else packageSetting
+        return output == 0
 
-    def _splitWindowAndFocus(self):
+    def splitWindowAndFocus(self):
         theLayout = self.window.get_layout()
         theLayout["cells"] = [[0, 0, 1, 1], [1, 0, 2, 1]]
         theLayout["rows"] = [0.0, 1.0]
@@ -172,15 +151,15 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
         self.window.set_layout(theLayout)
         self.window.focus_group(1)
 
-    def _openAndDisplay(self):
+    def openAndDisplay(self):
         if self.shouldOpen:
             plat = sublime.platform()
             if plat == "osx":
-                subprocess.call(["open", self.outFile])
+                subprocess.Popen(["open", self.outFile])
             elif plat == "windows":
                 os.startfile(self.outFile)
             elif plat == "linux":
-                subprocess.call(["xdg-open", self.outFile])
+                subprocess.Popen(["xdg-open", self.outFile])
 
         if not self.shouldDisplay:
             return
@@ -191,18 +170,20 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
                 wasShowing = True
                 break
         if not wasShowing and not self.shouldOpen:
-            self._splitWindowAndFocus()
+            self.splitWindowAndFocus()
             self.window.open_file(self.outFile)
         elif wasShowing and self.shouldOpen:
             self.window.run_command("close")
             theLayout = {"cells": [[0, 0, 1, 1]], "rows": [0.0, 1.0], "cols": [0.0, 1.0]}
             self.window.set_layout(theLayout)
 
-    def _walkIncludes(self, lookFor, prepend=None):
-        # Check the includes_paths, then the project hierarchy, for the file to include,
-        # but only if we don't already have a path.
-        # Order of preference should be: working DIR, project DIRs, then includes_paths,
-        # then finally giving up and passing the filename to Pandoc.
+    def walkIncludes(self, lookFor, prepend=None):
+        '''
+        Check the includes_paths, then the project hierarchy, for the file to include,
+        but only if we don't already have a path.
+        Order of preference should be: working DIR, project DIRs, then includes_paths,
+        then finally giving up and passing the filename to Pandoc.
+        '''
 
         debug("Looking for " + lookFor)
         # Did the user pass a specific file?
@@ -235,15 +216,16 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
             debug("topLevel: " + topLevel)
             checkDIR = self.workingDIR
             debug("Initial checkDIR: " + checkDIR)
-            while True:
-                fileToCheck = os.path.join(checkDIR, lookFor)
-                if os.path.exists(fileToCheck):
-                    debug("It's in the project! Returning %s." % fileToCheck)
-                    return prepend + fileToCheck if prepend else fileToCheck
-                if checkDIR == topLevel:
-                    break
-                else:
-                    checkDIR = os.path.abspath(os.path.join(checkDIR, os.path.pardir))
+            if topLevel:
+                while True:
+                    fileToCheck = os.path.join(checkDIR, lookFor)
+                    if os.path.exists(fileToCheck):
+                        debug("It's in the project! Returning %s." % fileToCheck)
+                        return prepend + fileToCheck if prepend else fileToCheck
+                    if checkDIR == topLevel:
+                        break
+                    else:
+                        checkDIR = os.path.abspath(os.path.join(checkDIR, os.path.pardir))
 
         # Are there no paths to check?
         if self.includes_paths_len == 0 and lookFor != "pandoc-config.json":
@@ -269,488 +251,122 @@ class pandownBuildCommand(sublime_plugin.WindowCommand):
         sublime.error_message("Fatal error looking for " + lookFor)
         return None
 
-    def _buildPandocCmd(self, inFile, to, pandoc_from, a):
+    def buildPandocCmd(self, inFile, to, pandoc_from, a):
         cmd = ['pandoc']
 
         try:
-            f = open(os.path.join(sublime.packages_path(), 'Pandown', '.default-pandoc-config-plain.json'))
+            f = codecs.open(os.path.join(sublime.packages_path(), 'Pandown', '.default-pandoc-config-plain.json'), "r", "utf-8")
         except IOError as e:
-            sublime.message_dialog("Could not open default configuration file. See console for details.")
-            print "[Pandown Exception: " + str(e) + "]"
-            print "[See README for help and support information.]"
+            sublime.error_message("Could not open default configuration file.")
+            err("Pandown Exception: " + str(e))
+            err("See README for help and support information.")
             return None
         else:
             s = json.load(f)
             f.close()
             sArg = s["pandoc_arguments"]
             s = sArg
+        
+        s["command_arguments"]["indented-code-classes"].extend(a["command_arguments"].pop("indented-code-classes", []))
+        s["command_arguments"]["variables"].update(a["command_arguments"].pop("variables", {}))
+        s["command_arguments"]["include-in-header"].extend(a["command_arguments"].pop("include-in-header", []))
+        s["command_arguments"]["include-before-body"].extend(a["command_arguments"].pop("include-before-body", []))
+        s["command_arguments"]["include-after-body"].extend(a["command_arguments"].pop("include-after-body", []))
+        s["command_arguments"]["css"].extend(a["command_arguments"].pop("css", []))
+        s["command_arguments"]["number-offset"].extend(a["command_arguments"].pop("number-offset", []))
+        s["command_arguments"].update(a["command_arguments"])
+        s["markdown_extensions"].update(a["markdown_extensions"])
 
-        s["indented_code_classes"].extend(a.pop("indented_code_classes", []))
-        s["variables"].update(a.pop("variables", []))
-        s["include_in_header"].extend(a.pop("include_in_header", []))
-        s["include_before_body"].extend(a.pop("include_before_body", []))
-        s["include_after_body"].extend(a.pop("include_after_body", []))
-        s["css"].extend(a.pop("css", []))
-        s.update(a)
-
-        configLoc = self._walkIncludes("pandoc-config.json")
+        configLoc = self.walkIncludes("pandoc-config.json")
         if configLoc:
             try:
                 f = open(configLoc)
             except IOError as e:
                 sublime.status_message("Error: pandoc-config exists, but could not be read.")
-                print "[Pandown Exception: " + str(e) + "]"
-                print "[See README for help and support information.]"
+                err("Pandown Exception: " + str(e))
+                err("See README for help and support information.")
             else:
                 pCommentedStr = f.read()
                 f.close()
-                pStr = minify_json.json_minify(pCommentedStr)
+                pStr = Pandown.minify_json.json_minify(pCommentedStr)
                 try:
                     p = json.loads(pStr)
                 except (KeyError, ValueError) as e:
                     sublime.status_message("JSON Error: Cannot parse pandoc-config. See console for details.")
-                    print "[Pandown Exception: " + str(e) + "]"
-                    print "[See README for help and support information.]"
+                    err("Pandown Exception: " + str(e))
+                    err("See README for help and support information.")
                     return None
                 if "pandoc_arguments" in p:
                     pArg = p["pandoc_arguments"]
                     p = pArg
-            s["indented_code_classes"].extend(p.pop("indented_code_classes", []))
-            s["variables"].update(p.pop("variables", []))
-            s["include_in_header"].extend(p.pop("include_in_header", []))
-            s["include_before_body"].extend(p.pop("include_before_body", []))
-            s["include_after_body"].extend(p.pop("include_after_body", []))
-            s["css"].extend(p.pop("css", []))
-            s.update(p)
 
+            if p.get("command_arguments", None):
+                s["command_arguments"]["indented-code-classes"].extend(p["command_arguments"].pop("indented-code-classes", []))
+                s["command_arguments"]["variables"].update(p["command_arguments"].pop("variables", {}))
+                s["command_arguments"]["include-in-header"].extend(p["command_arguments"].pop("include-in-header", []))
+                s["command_arguments"]["include-before-body"].extend(p["command_arguments"].pop("include-before-body", []))
+                s["command_arguments"]["include-after-body"].extend(p["command_arguments"].pop("include-after-body", []))
+                s["command_arguments"]["css"].extend(p["command_arguments"].pop("css", []))
+                s["command_arguments"]["number-offset"].extend(p["command_arguments"].pop("number-offset", []))
+                s["command_arguments"].update(p["command_arguments"])
+            if p.get("markdown_extensions", None):
+                s["markdown_extensions"].update(p["markdown_extensions"])
+
+        markdown_extensions = s["markdown_extensions"]
         if pandoc_from == "markdown":
-            # Parse Pandoc Markdown extensions
-            if s["escaped_line_breaks"]:
-                pandoc_from += "+escaped_line_breaks"
-            else:
-                pandoc_from += "-escaped_line_breaks"
+            md_config = "markdown"
+            for (k, v) in markdown_extensions.items():
+                sign = "+" if v else "-"
+                append = "%s%s" % (sign, k)
+                md_config += append
+            pandoc_from = md_config
 
-            if s["blank_before_header"]:
-                pandoc_from += "+blank_before_header"
-            else:
-                pandoc_from += "-blank_before_header"
-
-            if s["header_attributes"]:
-                pandoc_from += "+header_attributes"
-            else:
-                pandoc_from += "-header_attributes"
-
-            if s["auto_identifiers"]:
-                pandoc_from += "+auto_identifiers"
-            else:
-                pandoc_from += "-auto_identifiers"
-
-            if s["implicit_header_references"]:
-                pandoc_from += "+implicit_header_references"
-            else:
-                pandoc_from += "-implicit_header_references"
-
-            if s["blank_line_before_blockquote"]:
-                pandoc_from += "+blank_before_blockquote"
-            else:
-                pandoc_from += "-blank_before_blockquote"
-
-            if s["fenced_code_blocks"]:
-                pandoc_from += "+fenced_code_blocks"
-            else:
-                pandoc_from += "-fenced_code_blocks"
-
-            if s["line_blocks"]:
-                pandoc_from += "+line_blocks"
-            else:
-                pandoc_from += "-line_blocks"
-
-            if s["fancy_lists"]:
-                pandoc_from += "+fancy_lists"
-            else:
-                pandoc_from += "-fancy_lists"
-
-            if s["startnum"]:
-                pandoc_from += "+startnum"
-            else:
-                pandoc_from += "-startnum"
-
-            if s["definition_lists"]:
-                pandoc_from += "+definition_lists"
-            else:
-                pandoc_from += "-definition_lists"
-
-            if s["example_lists"]:
-                pandoc_from += "+example_lists"
-            else:
-                pandoc_from += "-example_lists"
-
-            if s["simple_tables"]:
-                pandoc_from += "+simple_tables"
-            else:
-                pandoc_from += "-simple_tables"
-
-            if s["multiline_tables"]:
-                pandoc_from += "+multiline_tables"
-            else:
-                pandoc_from += "-multiline_tables"
-
-            if s["grid_tables"]:
-                pandoc_from += "+grid_tables"
-            else:
-                pandoc_from += "-grid_tables"
-
-            if s["pipe_tables"]:
-                pandoc_from += "+pipe_tables"
-            else:
-                pandoc_from += "-pipe_tables"
-
-            if s["table_captions"]:
-                pandoc_from += "+table_captions"
-            else:
-                pandoc_from += "-table_captions"
-
-            if s["pandoc_title_block"]:
-                pandoc_from += "+pandoc_title_block"
-            else:
-                pandoc_from += "-pandoc_title_block"
-
-            if s["all_symbols_escapable"]:
-                pandoc_from += "+all_symbols_escapable"
-            else:
-                pandoc_from += "-all_symbols_escapable"
-
-            if s["intraword_underscores"]:
-                pandoc_from += "+intraword_underscores"
-            else:
-                pandoc_from += "-intraword_underscores"
-
-            if s["strikeout"]:
-                pandoc_from += "+strikeout"
-            else:
-                pandoc_from += "-strikeout"
-
-            if s["superscript"]:
-                pandoc_from += "+superscript"
-            else:
-                pandoc_from += "-superscript"
-
-            if s["subscript"]:
-                pandoc_from += "+subscript"
-            else:
-                pandoc_from += "-subscript"
-
-            if s["inline_code_attributes"]:
-                pandoc_from += "+inline_code_attributes"
-            else:
-                pandoc_from += "-inline_code_attributes"
-
-            if s["tex_math_dollars"]:
-                pandoc_from += "+tex_math_dollars"
-            else:
-                pandoc_from += "-tex_math_dollars"
-
-            if s["raw_html"]:
-                pandoc_from += "+raw_html"
-            else:
-                pandoc_from += "-raw_html"
-
-            if s["markdown_in_html_blocks"]:
-                pandoc_from += "+markdown_in_html_blocks"
-            else:
-                pandoc_from += "-markdown_in_html_blocks"
-
-            if s["raw_tex"]:
-                pandoc_from += "+raw_tex"
-            else:
-                pandoc_from += "-raw_tex"
-
-            if s["latex_macros"]:
-                pandoc_from += "+latex_macros"
-            else:
-                pandoc_from += "-latex_macros"
-
-            if s["implicit_figures"]:
-                pandoc_from += "+implicit_figures"
-            else:
-                pandoc_from += "-implicit_figures"
-
-            if s["footnotes"]:
-                pandoc_from += "+footnotes"
-            else:
-                pandoc_from += "-footnotes"
-
-            if s["inline_notes"]:
-                pandoc_from += "+inline_notes"
-            else:
-                pandoc_from += "-inline_notes"
-
-            if s["citations"]:
-                pandoc_from += "+citations"
-            else:
-                pandoc_from += "-citations"
-
-            if s["hard_line_breaks"]:
-                pandoc_from += "+hard_line_breaks"
-            else:
-                pandoc_from += "-hard_line_breaks"
-
-            if s["tex_math_single_backslash"]:
-                pandoc_from += "+tex_math_single_backslash"
-            else:
-                pandoc_from += "-tex_math_single_backslash"
-
-            if s["tex_math_double_backslash"]:
-                pandoc_from += "+tex_math_double_backslash"
-            else:
-                pandoc_from += "-tex_math_double_backslash"
-
-            if s["markdown_attribute"]:
-                pandoc_from += "+markdown_attribute"
-            else:
-                pandoc_from += "-markdown_attribute"
-
-            if s["mmd_title_block"]:
-                pandoc_from += "+mmd_title_block"
-            else:
-                pandoc_from += "-mmd_title_block"
-
-            if s["abbreviations"]:
-                pandoc_from += "+abbreviations"
-            else:
-                pandoc_from += "-abbreviations"
-
-            if s["autolink_bare_urls"]:
-                pandoc_from += "+autolink_bare_uris"
-            else:
-                pandoc_from += "-autolink_bare_uris"
-
-            if s["link_attributes"]:
-                pandoc_from += "+link_attributes"
-            else:
-                pandoc_from += "-link_attributes"
-
-            if s["mmd_header_identifiers"]:
-                pandoc_from += "+mmd_header_identifiers"
-            else:
-                pandoc_from += "-mmd_header_identifiers"
-
-
-
-        if self.fromDirty:
+        if self.makePDF:
+            self.outFile = os.path.splitext(inFile)[0] + ".pdf" if not self.criticized else os.path.splitext(self.origIn)[0] + ".pdf"
+            cmd.append("--output=" + self.outFile)
             cmd.append("--from=" + pandoc_from)
-            cmd.append("--to=" + to[0])
-            inFile = self.tempLoc
         elif self.toWindow:
             pass
-        elif self.makePDF:
-            self.outFile = os.path.splitext(inFile)[0] + ".pdf"
-            cmd.append("--output=" + self.outFile)
-            cmd.append("--from=" + pandoc_from)
         else:
-            self.outFile = os.path.splitext(inFile)[0] + to[1]
+            self.outFile = os.path.splitext(inFile)[0] + to[1] if not self.criticized else os.path.splitext(self.origIn)[0] + to[1]
             cmd.append("--output=" + self.outFile)
             cmd.append("--to=" + to[0])
             cmd.append("--from=" + pandoc_from)
 
-        try:
-            if s["data_dir"]:
-                cmd.append("--data-dir=" + s["data_dir"])
-            if s["parse_raw"]:
-                cmd.append("--parse-raw")
-            if s["smart"]:
-                cmd.append("--smart")
-            if s["old_dashes"]:
-                cmd.append("--old-dashes")
-            if s["base_header_level"] != 1:
-                cmd.append("--base-header-level=" + str(s["base_header_level"]))
-
-            if len(s["indented_code_classes"]) > 0 and isinstance(s["indented_code_classes"], list):
-                buff = "--indented-code-classes="
-                for theClass in s["indented_code_classes"]:
-                    buff = buff + str(theClass) + " "
-                cmd.append(buff)
-
-            if s["normalize"]:
-                cmd.append("--normalize")
-            if s["tab_stop"] != 4:
-                cmd.append("--tab-stop=" + str(s["tab_stop"]))
-            if s["standalone"]:
-                cmd.append("--standalone")
-
-            if s["template"]:
-                toAppend = self._walkIncludes(s["template"], "--template=")
-                cmd.append(toAppend)
-
-            if s["variables"] != {}:
-                for (k, v) in s["variables"].iteritems():
-                    if isinstance(v, list):
-                        for items in v:
-                            cmd.append("--variable=" + str(k) + ":" + str(items))
+        command_arguments = s["command_arguments"]
+        for (k, v) in command_arguments.items():
+            if v == True:
+                cmd.append("--%s" % k)
+            elif v == False:
+                pass
+            elif isinstance(v, list) and len(v) > 0:
+                if k == "indented-code-classes" or k == "number-offset":
+                    buff = "--%s=" % k
+                    for item in v:
+                        buff += str(item) + ","
+                    cmd.append(buff[:-1])
+                else:
+                    for theFile in v:
+                        toAppend = self.walkIncludes(theFile, "--%s=" % k)
+                        cmd.append(toAppend)
+            elif isinstance(v, dict):
+                for (_k, _v) in v.items():
+                    if isinstance(_v, list):
+                        for item in _v:
+                            cmd.append("--variable=" + _k + ":" + item)
                     else:
-                        if v != False:
-                            cmd.append("--variable=" + str(k) + ":" + str(v))
-            if s["no_wrap"]:
-                cmd.append("--no-wrap")
-            if s["columns"] > 0:
-                cmd.append("--columns=" + repr(s["columns"]))
-            if s["table_of_contents"]:
-                cmd.append("--table-of-contents")
-            if s["no_highlight"]:
-                cmd.append("--no-highlight")
-            if s["highlight_style"]:
-                cmd.append("--highlight-style=" + s["highlight_style"])
-
-            # As inappropriate as all this typechecking is, I can't think of another way to
-            # be absolutely sure that the user didn't pass in a single string.
-            if isinstance(s["include_in_header"], list):
-                for theInclude in s["include_in_header"]:
-                    toAppend = self._walkIncludes(theInclude, "--include-in-header=")
-                    cmd.append(toAppend)
-            else:
-                print "[Pandown Warning: include_in_header should be a list. Ignoring.]"
-                sublime.status_message("include_in_header not a list.")
-
-            if isinstance(s["include_before_body"], list):
-                for theInclude in s["include_before_body"]:
-                    toAppend = self._walkIncludes(theInclude, "--include-before-body=")
-                    cmd.append(toAppend)
-            else:
-                print "[Pandown Warning: include_before_body should be a list. Ignoring.]"
-                sublime.status_message("include_before_body not a list.")
-
-            if isinstance(s["include_after_body"], list):
-                for theInclude in s["include_after_body"]:
-                    toAppend = self._walkIncludes(theInclude, "--include-after-body=")
-                    cmd.append(toAppend)
-            else:
-                print "[Pandown Warning: include_after_body should be a list. Ignoring.]"
-                sublime.status_message("include_after_body not a list.")
-
-            if s["self_contained"]:
-                cmd.append("--self-contained")
-            if s["html_q_tags"]:
-                cmd.append("--html-q-tags")
-            if s["ascii"]:
-                cmd.append("--ascii")
-            if s["reference_links"]:
-                cmd.append("--reference-links")
-            if s["atx_headers"]:
-                cmd.append("--atx-headers")
-            if s["chapters"]:
-                cmd.append("--chapters")
-            if s["number_sections"]:
-                cmd.append("--number-sections")
-            if s["no_tex_ligatures"]:
-                cmd.append("--no-tex-ligatures")
-            if s["listings"]:
-                cmd.append("--listings")
-            if s["incremental"]:
-                cmd.append("--incremental")
-            if s["slide_level"] > -1:
-                cmd.append("--slide-level=" + str(s["slide_level"]))
-            if s["section_divs"]:
-                cmd.append("--section-divs")
-            if s["email_obfuscation"] != "":
-                cmd.append("--email-obfuscation=" + s["email_obfuscation"])
-            if s["id_prefix"]:
-                cmd.append("--id-prefix=" + s["id_prefix"])
-            if s["title_prefix"]:
-                cmd.append("--title-prefix=" + s["title_prefix"])
-
-            if isinstance(s["css"], list) and len(s["css"]) > 0:
-                for theCSS in s["css"]:
-                    cmd.append("--css=" + theCSS)
-
-            if s["reference_odt"] != "":
-                toAppend = self._walkIncludes(s["reference_odt"], "--reference-odt=")
-                cmd.append(toAppend)
-            if s["reference_docx"] != "":
-                toAppend = self._walkIncludes(s["reference_docx"], "--reference-docx=")
-                cmd.append(toAppend)
-            if s["epub_stylesheet"] != "":
-                toAppend = self._walkIncludes(s["epub_stylesheet"], "--epub-stylesheet=")
-                cmd.append(toAppend)
-            if s["epub_coverimage"] != "":
-                toAppend = self._walkIncludes(s["epub_coverimage"], "--epub-cover-image=")
-                cmd.append(toAppend)
-            if s["epub_metadata"] != "":
-                toAppend = self._walkIncludes(s["epub_metadata"], "--epub-metadata=")
-                cmd.append(toAppend)
-            if s["epub_embed_font"] != "":
-                toAppend = self._walkIncludes(s["epub_embed_font"], "--epub-embed-font=")
-                cmd.append(toAppend)
-            if s["latex_engine"] != "":
-                cmd.append("--latex-engine=" + s["latex_engine"])
-            if s["bibliography"] != "":
-                toAppend = self._walkIncludes(s["bibliography"], "--bibliography=")
-                cmd.append(toAppend)
-            if s["csl"] != "":
-                toAppend = self._walkIncludes(s["csl"], "--csl=")
-                cmd.append(toAppend)
-            if s["citation_abbreviations"] != "":
-                toAppend = self._walkIncludes(s["citation_abbreviations"], "--citation-abbreviations=")
-                cmd.append(toAppend)
-            if s["natbib"]:
-                cmd.append("--natbib")
-            if s["biblatex"]:
-                cmd.append("--biblatex")
-            if s["gladtex"]:
-                cmd.append("--gladtex")
-
-            latexmathml = s["latexmathml"]
-            if latexmathml == False:
-                pass
-            elif latexmathml == True:
-                cmd.append("--latexmathml")
-            else:
-                cmd.append("--latexmathml=" + latexmathml)
-
-            mathml = s["mathml"]
-            if mathml == False:
-                pass
-            elif mathml == True:
-                cmd.append("--mathml")
-            else:
-                cmd.append("--mathml=" + mathml)
-
-            jsmath = s["jsmath"]
-            if jsmath == False:
-                pass
-            elif jsmath == True:
-                cmd.append("--jsmath")
-            else:
-                cmd.append("--jsmath=" + jsmath)
-
-            mathjax = s["mathjax"]
-            if mathjax == False:
-                pass
-            elif mathjax == True:
-                cmd.append("--mathjax")
-            else:
-                cmd.append("--mathjax=" + mathjax)
-
-            mimetex = s["mimetex"]
-            if mimetex == False:
-                pass
-            elif mimetex == True:
-                cmd.append("--mimetex")
-            else:
-                cmd.append("--mimetex=" + mimetex)
-
-            webtex = s["webtex"]
-            if webtex == False:
-                pass
-            elif webtex == True:
-                cmd.append("--webtex")
-            else:
-                cmd.append("--webtex=" + webtex)
-        except (KeyError, ValueError) as e:
-            sublime.error_message("Pandown: Errors in configuration file. See console for details.")
-            print "[Pandown Exception: " + str(e) + "]"
-            print "[See README for help and support information.]"
-            return None
+                        if _v != False:
+                            cmd.append("--variable=" + _k + ":" + _v)
+            elif (isinstance(v, str) and len(v) > 0) or isinstance(v, int):
+                if k == "template":
+                    cmd.append(self.walkIncludes(v, "--%s=" % k))
+                else:
+                    cmd.append("--%s=%s" % (k, v))
 
         cmd.append(inFile)
 
         return cmd
+
+class PandownOutViewEraseCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        self.view.erase(edit, sublime.Region(0, self.view.size()))

@@ -109,4 +109,4 @@ something else */"blah"
     assert test_json(test3) == json.loads(test3_res),'Failed test 3'
     assert test_json(test4) == json.loads(test4_res),'Failed test 4'
     if __debug__: # Don't print passed message if the asserts didn't run
-        print 'Passed all tests'
+        print('Passed all tests')

@@ -1,6 +1,0 @@
-Pandown Plugin for Sublime Text 2
----------------------------------
-          Version 1.0.0
-
-Initial release version. For more
-information, see README.mdown.

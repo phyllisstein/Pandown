@@ -4,7 +4,7 @@
 		"command": "pandown_touch_project_config"
 	},
 	{
-		"caption": "Pandown: Build Markdown to Window",
+		"caption": "Pandown: Build to Window",
 		"command": "pandown_build",
 		"args": { "to_window": true}
 	}

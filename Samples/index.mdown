@@ -48,7 +48,7 @@ In addition, three variables are set on a per-document basis by its title block.
 
 Customizing Variables
 ---------------------
-Pandoc also allows you to define arbitrary variables in the command line, so of course, Pandown does too. Under `pandoc_arguments`, set the dictionary `variables` to whatever keys and values you like. Values can even be lists, allowing you to completely duplicate the built-in functionality. For example, the `github.html` template is set up to work with the variable `javascript`. The template has these three lines:
+Pandoc also allows you to define arbitrary variables in the command line, so of course, Pandown does too. Under `pandoc_arguments`, set the dictionary `variables` to whatever keys and values you like. Values can even be lists, allowing you to completely duplicate the built-in functionality. For example, the `github.html` template is set up to work with the variable `javascript`. The template has these lines:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.html .numberLines}
 $for(javascript)$
@@ -96,7 +96,7 @@ This potentially has some interesting uses. Let's say you had one template that 
 
 You could conceivably extend this basic solution in any number of ways.
 
-You can also simply set a variable to `true` if you want to toggle parts of your code on and off. In this template, you can change the way the syntax highlighting looks by setting the variable `pygments` to `true`. By default, highlighting designed by [Brett] to mimic the look of GitHub is used; turning `pygments` on will switch it to [Pygments](http://www.pygments.org)' built-in style.
+You can also simply set a variable to `true` if you want to toggle parts of your code on and off.
 
 Go Forth
 ---------
