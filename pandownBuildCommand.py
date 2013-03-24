@@ -288,7 +288,11 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
             else:
                 pCommentedStr = f.read()
                 f.close()
-                pStr = Pandown.minify_json.json_minify(pCommentedStr)
+                global __ST3
+                if __ST3:
+                    pStr = Pandown.minify_json.json_minify(pCommentedStr)
+                else:
+                    pStr = minify_json.json_minify(pCommentedStr)
                 try:
                     p = json.loads(pStr)
                 except (KeyError, ValueError) as e:
