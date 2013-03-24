@@ -288,8 +288,7 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
             else:
                 pCommentedStr = f.read()
                 f.close()
-                global __ST3
-                if __ST3:
+                if int(sublime.version()) >= 3000:
                     pStr = Pandown.minify_json.json_minify(pCommentedStr)
                 else:
                     pStr = minify_json.json_minify(pCommentedStr)
