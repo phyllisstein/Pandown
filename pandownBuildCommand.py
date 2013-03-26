@@ -38,11 +38,14 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
         if user_env:
             env.update(user_env)
         env.update(os.environ.copy())
-        env['PATH'] = env['PATH'] + ":" + s.get("install_path", "/usr/local/bin") + ":" + s.get("texbin_path", "/usr/texbin")
+        if sublime.platform() == "osx" or sublime.platform == "linux":
+            env['PATH'] = env['PATH'] + ":" + s.get("install_path", "/usr/local/bin") + ":" + s.get("texbin_path", "/usr/texbin")
+        else:
+            env['PATH'] = env['PATH'] + ";" + s.get("install_path", "C:\\Program Files\\") + ";" + s.get("texbin_path", "C:\\Program Files\\MiKTeX 2.9\\miktex\\bin\\")
 
-        # if not self.checkPandoc(env):
-        #     sublime.error_message("Pandown requires Pandoc")
-        #     return
+        if not self.checkPandoc(env):
+            sublime.error_message("Pandown requires Pandoc")
+            return
 
         DEBUG_MODE = s.get("PANDOWN_DEBUG", False)
 
@@ -133,15 +136,15 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
             else:
                 outView.set_name("Pandoc Output: " + time.strftime("%X on %x"))
 
-    # def checkPandoc(self, env):
-    #     cmd = ['pandoc', '--version']
-    #     try:
-    #         output = subprocess.check_call(cmd, env=env)
-    #     except Exception as e:
-    #         err("Exception: " + str(e))
-    #         return False
+    def checkPandoc(self, env):
+        cmd = ['pandoc', '--version']
+        try:
+            output = subprocess.check_call(cmd, env=env)
+        except Exception as e:
+            err("Exception: " + str(e))
+            return False
 
-    #     return output == 0
+        return output == 0
 
     def splitWindowAndFocus(self):
         theLayout = self.window.get_layout()
