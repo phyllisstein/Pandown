@@ -1,0 +1,14 @@
+        PANDOWN FOR SUBLIME TEXT 2 & 3
+              by Daniel Shannon
+    ======================================
+        Thanks for installing Pandown!
+        If you haven't yet set up Pandoc,
+        at at least version 1.10, now
+        would be a good time to do so.
+                Grab a copy at:
+        http://johnmacfarlane.net/pandoc/
+
+        And be sure to check out the
+        README.mdown file and the change
+        log for information about this
+            version of Pandown.

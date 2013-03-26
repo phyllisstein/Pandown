@@ -23,6 +23,13 @@
                                 "caption": "README"
                             },
                             {
+                                "command": "open_file", "args":
+                                {
+                                    "file": "${packages}/Pandown/changelog.mdown"
+                                },
+                                "caption": "changelog"
+                            },
+                            {
                                 "caption": "-"
                             },
                             {

@@ -1,0 +1,25 @@
+        PANDOWN FOR SUBLIME TEXT 2 & 3
+              by Daniel Shannon
+    ======================================
+        Please note that in this version
+        of Pandown, the syntax for the
+        configuration files has changed.
+        To see what the new format should
+        look like, check the settings
+        files or take a look at:
+{Packages}/Pandown/default-pandoc-config.json
+        
+        The crux of the change is that the
+        settings have been split into two
+        dictionaries, one for Markdown
+        extensions and one for command-line
+        arguments, and the command-line
+        arguments are named with dashes
+        rather than underscores. This change
+        roughly halves the amount of code
+        in Pandown, and speeds it up
+                considerably.
+
+        Please feel free to write Daniel
+        with any questions or problems,
+                at d@daniel.sh.
