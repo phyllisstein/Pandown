@@ -232,8 +232,9 @@
 			// Merge adjacent elements, remove repeated spaces, etc.
 			"normalize": true,
 
-			// Set the number of spaces per tab.
-			"tab-stop": 4,
+			// Set the number of spaces per tab. Should be set to
+			// "false" (for default behavior) or a number.
+			"tab-stop": false,
 
 			// Generate "an appropriate header and footer"
 			"standalone": true,

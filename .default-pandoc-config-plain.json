@@ -58,7 +58,7 @@
 			],
 			"default-image-extension": "",
 			"normalize": true,
-			"tab-stop": 4,
+			"tab-stop": false,
 			"standalone": true,
 			"template": "",
 			"variables":
