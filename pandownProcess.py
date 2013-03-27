@@ -37,7 +37,7 @@ class PandownAsyncProcess(object):
         for k, v in list(processEnvironment.items()):
             processEnvironment[k] = os.path.expandvars(v)
 
-        self.process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, startupinfo=startupinfo, env=processEnvironment)
+        self.process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, startupinfo=startupinfo, env=processEnvironment, shell=True)
         if self.process.stdout:
             # _thread.start_new_thread(self.read_stdout, ())
             threading.Thread(target=self.read_stdout).start()
@@ -142,6 +142,10 @@ class PandownExecCommand(sublime_plugin.WindowCommand, PandownProcessListener):
             if user_env:
                 merged_env.update(user_env)
 
+        if sublime.platform() == "windows":
+            for k, v in merged_env.items():
+                merged_env[k] = str(v)
+
         if working_dir != "":
             os.chdir(working_dir)
 
@@ -159,6 +163,8 @@ class PandownExecCommand(sublime_plugin.WindowCommand, PandownProcessListener):
         except Exception as e:
             self.append_string_err(None, str(e) + "\n")
             self.append_string_err(None, self.debug_text + "\n")
+            print(self.debug_text)
+            print(e)
             if not self.quiet:
                 self.append_string_err(None, "[Finished]")
 

@@ -42,6 +42,7 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
             env['PATH'] = env['PATH'] + ":" + s.get("install_path", "/usr/local/bin") + ":" + s.get("texbin_path", "/usr/texbin")
         else:
             env['PATH'] = env['PATH'] + ";" + s.get("install_path", "C:\\Program Files\\") + ";" + s.get("texbin_path", "C:\\Program Files\\MiKTeX 2.9\\miktex\\bin\\")
+            env['PATH'] = str(env['PATH'])
 
         if not self.checkPandoc(env):
             sublime.error_message("Pandown requires Pandoc")
@@ -139,7 +140,7 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
     def checkPandoc(self, env):
         cmd = ['pandoc', '--version']
         try:
-            output = subprocess.check_call(cmd, env=env)
+            output = subprocess.check_call(cmd, env=env, shell=True)
         except Exception as e:
             err("Exception: " + str(e))
             return False
