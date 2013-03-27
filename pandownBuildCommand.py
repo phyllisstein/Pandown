@@ -353,7 +353,7 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
                     cmd.append(buff[:-1])
                 else:
                     for theFile in v:
-                        toAppend = self.walkIncludes(theFile, "--%s=" % k)
+                        toAppend = self.walkIncludes(theFile, prepend="--%s=" % k)
                         cmd.append(toAppend)
             elif isinstance(v, dict):
                 for (_k, _v) in v.items():
@@ -365,7 +365,7 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
                             cmd.append("--variable=" + _k + ":" + _v)
             elif (isinstance(v, str) and len(v) > 0) or isinstance(v, int):
                 if k == "template":
-                    cmd.append(self.walkIncludes(v, "--%s=" % k))
+                    cmd.append(self.walkIncludes(v, prepend="--%s=" % k))
                 else:
                     cmd.append("--%s=%s" % (k, v))
 
