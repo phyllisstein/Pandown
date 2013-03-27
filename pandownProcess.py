@@ -37,7 +37,7 @@ class PandownAsyncProcess(object):
         for k, v in list(processEnvironment.items()):
             processEnvironment[k] = os.path.expandvars(v)
 
-        self.process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, startupinfo=startupinfo, env=processEnvironment)
+        self.process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, startupinfo=startupinfo, env=processEnvironment, shell=True)
         if self.process.stdout:
             # _thread.start_new_thread(self.read_stdout, ())
             threading.Thread(target=self.read_stdout).start()
@@ -121,7 +121,10 @@ class PandownExecCommand(sublime_plugin.WindowCommand, PandownProcessListener):
         else:
             self.error_view.set_syntax_file(syntax)
 
-        self.window.create_output_panel("exec") if __ST3 else self.window.get_output_panel("exec")
+        if __ST3:
+            self.window.create_output_panel("exec")
+        else:
+            self.window.get_output_panel("exec")
 
         self.encoding = encoding
         self.quiet = quiet
@@ -142,6 +145,10 @@ class PandownExecCommand(sublime_plugin.WindowCommand, PandownProcessListener):
             if user_env:
                 merged_env.update(user_env)
 
+        if sublime.platform() == "windows":
+            for k, v in merged_env.items():
+                merged_env[k] = str(v)
+
         if working_dir != "":
             os.chdir(working_dir)
 
@@ -159,6 +166,8 @@ class PandownExecCommand(sublime_plugin.WindowCommand, PandownProcessListener):
         except Exception as e:
             self.append_string_err(None, str(e) + "\n")
             self.append_string_err(None, self.debug_text + "\n")
+            print(self.debug_text)
+            print(e)
             if not self.quiet:
                 self.append_string_err(None, "[Finished]")
 
@@ -193,6 +202,7 @@ class PandownExecCommand(sublime_plugin.WindowCommand, PandownProcessListener):
             sublime.status_message("Build finished with %d errors" % len(errs))
 
     def append_data_error(self, proc, data):
+        __ST3 = int(sublime.version()) >= 3000
         if proc != self.proc:
             if proc:
                 proc.kill()
@@ -205,10 +215,21 @@ class PandownExecCommand(sublime_plugin.WindowCommand, PandownProcessListener):
             proc = None
 
         string = string.replace("\r\n", "\n").replace("\r", "\n")
-
-        self.error_view.run_command("append", {"characters": string, "force": True})
+        if __ST3:
+            self.error_view.run_command("append", {"characters": string, "force": True})
+        else:
+            selection_was_at_end = (len(self.error_view.sel()) == 1
+                and self.error_view.sel()[0] == sublime.Region(self.error_view.size()))
+            self.error_view.set_read_only(False)
+            edit = self.error_view.begin_edit()
+            self.error_view.insert(edit, self.error_view.size(), string)
+            if selection_was_at_end:
+                self.error_view.show(self.error_view.size())
+            self.error_view.end_edit(edit)
+            self.error_view.set_read_only(True)
 
     def append_data_output(self, proc, data):
+        __ST3 = int(sublime.version()) >= 3000
         if proc != self.proc:
             if proc:
                 proc.kill()
@@ -221,8 +242,16 @@ class PandownExecCommand(sublime_plugin.WindowCommand, PandownProcessListener):
             proc = None
 
         string = string.replace("\r\n", "\n").replace("\r", "\n")
-
-        self.output_view.run_command("append", {"characters": string, "force": True})
+        if __ST3:
+            self.output_view.run_command("append", {"characters": string, "force": True})
+        else:
+            selection_was_at_end = (len(self.output_view.sel()) == 1
+                and self.output_view.sel()[0] == sublime.Region(self.output_view.size()))
+            edit = self.output_view.begin_edit()
+            self.output_view.insert(edit, self.output_view.size(), string)
+            if selection_was_at_end:
+                self.output_view.show(self.output_view.size())
+            self.output_view.end_edit(edit)
 
     def on_data_out(self, proc, data):
         if self.to_window == False:
