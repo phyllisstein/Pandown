@@ -37,7 +37,11 @@ class PandownAsyncProcess(object):
         for k, v in list(processEnvironment.items()):
             processEnvironment[k] = os.path.expandvars(v)
 
-        self.process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, startupinfo=startupinfo, env=processEnvironment, shell=True)
+        if sublime.platform() == "windows":
+            shell = True
+        else:
+            shell = False
+        self.process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, startupinfo=startupinfo, env=processEnvironment, shell=shell)
         if self.process.stdout:
             # _thread.start_new_thread(self.read_stdout, ())
             threading.Thread(target=self.read_stdout).start()
