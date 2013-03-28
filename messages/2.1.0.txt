@@ -1,0 +1,14 @@
+        PANDOWN FOR SUBLIME TEXT 2 & 3
+              by Daniel Shannon
+    ======================================
+        Patient Window users will be
+        thrilled to hear that this version
+        of Pandown has been tested on and
+        fixed-up for Windows 7. The last
+        of the bugs causing crashes,
+        freezes, and quiet failures seem
+        to have been righteously
+        squashed. But if you have any
+        additional trouble, please don't
+        hesitate to open a Github issue
+        or e-mail d at daniel dot sh.
