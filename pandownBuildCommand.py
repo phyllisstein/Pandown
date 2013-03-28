@@ -256,6 +256,7 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
         return None
 
     def buildPandocCmd(self, inFile, to, pandoc_from, a):
+        __ST3 = int(sublime.version()) >= 3000
         cmd = ['pandoc']
 
         try:
@@ -364,12 +365,16 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
                     else:
                         if _v != False:
                             cmd.append("--variable=" + _k + ":" + _v)
-            elif ((isinstance(v, unicode) or isinstance(v, str)) and len(v) > 0) or isinstance(v, int):
+            elif not __ST3 and (((isinstance(v, unicode) or isinstance(v, str)) and len(v) > 0) or isinstance(v, int)):
                 if k == "template":
                     cmd.append(self.walkIncludes(v, prepend="--%s=" % k))
                 else:
                     cmd.append("--%s=%s" % (k, v))
-
+            elif __ST3 and ((isinstance(v, str) and len(v) > 0) or isinstance(v, int)):
+                if k == "template":
+                    cmd.append(self.walkIncludes(v, prepend="--%s=" % k))
+                else:
+                    cmd.append("--%s=%s" % (k, v))
         cmd.append(inFile)
 
         return cmd
