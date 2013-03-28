@@ -1,16 +1,19 @@
 {
 	"pandoc_arguments":
 	{
-		"template": "github.html",
-		"variables":
+		"command_arguments":
 		{
-			"title-suffix": "Pandown",
-			"javascript": "jQuery.js",
-			"pygments": false
-			// "analytics-account": "",
-			// "analytics-domain": ""
-			// "max-width": "900px"
-		},
-		"email_obfuscation": "references"
+			"template": "github.html",
+			"variables":
+			{
+				"title-suffix": "Pandown",
+				"javascript": "jQuery.js",
+				"pygments": false
+				// "analytics-account": "",
+				// "analytics-domain": ""
+				// "max-width": "900px"
+			},
+			"email-obfuscation": "references"
+		}
 	}
 }
