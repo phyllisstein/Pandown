@@ -66,7 +66,7 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
             workingTemp = tempfile.NamedTemporaryFile("w+", delete=False)
             buff = self.view.substr(sublime.Region(0, self.view.size()))
             workingTemp.close()
-            with codecs.open(workingTemp.name(), "w+", "utf-8") as f:
+            with codecs.open(workingTemp.name, "w+", "utf-8") as f:
                 f.write(buff)
             inFile = workingTemp.name
             self.shouldOpen = False
