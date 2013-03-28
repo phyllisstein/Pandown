@@ -1,6 +1,6 @@
 % Custom Templates
 % Daniel Shannon
-% 2012-12-06
+% 2013-03-27
 
 Pandoc Custom Templates with Pandown: A Primer
 ==============================================
@@ -17,15 +17,15 @@ Pandoc templates can be customized on the fly by defining certain variables in t
 
 `header-includes`
  :    This reads the contents of a file verbatim into the template, usually just before the `</head>` tag.
-        You can set it in Pandown by configuring the value of `include_in_header`, which should be set to a list
-        (that is, even if it's one item, it should be enclosed in brackets, and multiple items can be included)
+        You can set it in Pandown by configuring the value of `include-in-header`, which should be set to a list
+        (that is, even if it's one item, it should be enclosed in square brackets, and multiple items can be included)
         of filenames or paths.
 `include-before`
  :    This inserts the contents of a file verbatim, usually just after the `<body>` tag. You can set it in Pandown
-        by configuring the value of `include_before`, which should be set to a list of filenames or paths.
+        by configuring the value of `include-before`, which should be set to a list of filenames or paths.
 `include-after`
  :    This copies the contents of a file into the template, usually just before the `</body>` tag. You can set it in
-        Pandown by configuring the value of `include_after`, which takes a list of filenames or paths.
+        Pandown by configuring the value of `include-after`, which takes a list of filenames or paths.
 `css`
  :    A variable used to link to one or more stylesheets rather than insert them. For each item in Pandown's `css`
         list, a `<link>` tag is generated that points to the supplied URI.
@@ -63,9 +63,12 @@ So if you include something like this in one of your configuration files, it'll 
 {
     "pandoc_arguments":
     {
-        "variables":
+        "command_arguments":
         {
-            "javascript": ["jquery.js", "jqueryui.js"]
+            "variables":
+            {
+                "javascript": ["jquery.js", "jqueryui.js"]
+            }
         }
     }
 }
@@ -74,13 +77,13 @@ So if you include something like this in one of your configuration files, it'll 
 This potentially has some interesting uses. Let's say you had one template that you were using across several projects, and you wanted to include Google Analytics code appropriate for each project. You could accomplish this in a few different ways:
 
 
-1. **Set `include_after_body` in one of your Sublime settings files.**
+1. **Set `include-after-body` in one of your Sublime settings files.**
 
     Set it to something like `ga.html` and drop a corresponding file in your build directory. The only problem?
     Pandoc will throw an error if you ever forget to include the file or override the setting. So if you use Pandoc
     for things you don't want Google analyzing, this'll get a little inconvenient.
 
-2. **Set `include_after_body` for each project.**
+2. **Set `include-after-body` for each project.**
 
     This is a better solution, but requires you to be constantly copying and pasting the file that contains the
     Analytics code into your new projects, changing the account ID and domain name each time. So if you're the sort of
@@ -94,13 +97,11 @@ This potentially has some interesting uses. Let's say you had one template that 
     `analytics-domain`. Set these in the `pandoc-config.json` file, and the code you need will be included; don't, and nothing
     happens. Thanks to nested `$if$`s, it'll even insert a comment gently reminding you to include the domain if you forget.
 
-You could conceivably extend this basic solution in any number of ways.
-
-You can also simply set a variable to `true` if you want to toggle parts of your code on and off.
+You could conceivably extend this basic solution in any number of ways. Try setting the variable `"max-width"` to `"900px"` and rebuilding this file, then take a look at how it's executed in `github.html`. You can also simply set a variable to `true` if you want to toggle parts of your code on and off. Set `"critic"` to true and enable the `"preprocess_critic"` setting in your Pandown settings to work with [CriticMarkup](http://criticmarkup.com).
 
 Go Forth
 ---------
-The `github.html` file is totally self-contained. If you want to use it as a template, place it in `~/.pandoc/templates/`, in one of your project folders, or in one of your `includes_paths`, and set the `template` argument to `github.html`. Tinker with it as you will! The syntax highlighting CSS in particular needs a great deal of work, because Pandoc assigns different classes to the syntactic items than do Brett and Pygments. It'd be appreciated if you left the comments crediting Brett, and the Pygments team, and me intact in any files that you generate from this template.
+The `github.html` file is totally self-contained. If you want to use it as a template, place it in `~/.pandoc/templates/`, in one of your project folders, or in one of your `includes_paths`, and set the `template` argument to `github.html`. Tinker with it as you will! It'd be appreciated if you left the comments crediting Brett, and the Pygments team, and me intact in any files that you generate from this template.
 
 
 [pandown]: http://sublime.daniel.sh/pandown/ "Pandown home"
