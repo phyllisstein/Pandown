@@ -364,7 +364,7 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
                     else:
                         if _v != False:
                             cmd.append("--variable=" + _k + ":" + _v)
-            elif (isinstance(v, str) and len(v) > 0) or isinstance(v, int):
+            elif ((isinstance(v, unicode) or isinstance(v, str)) and len(v) > 0) or isinstance(v, int):
                 if k == "template":
                     cmd.append(self.walkIncludes(v, prepend="--%s=" % k))
                 else:
