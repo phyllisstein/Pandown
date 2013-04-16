@@ -38,7 +38,7 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
         if user_env:
             env.update(user_env)
         env.update(os.environ.copy())
-        if sublime.platform() == "osx" or sublime.platform == "linux":
+        if sublime.platform() == "osx" or sublime.platform() == "linux":
             env['PATH'] = env['PATH'] + ":" + s.get("install_path", "/usr/local/bin") + ":" + s.get("texbin_path", "/usr/texbin")
         else:
             env['PATH'] = env['PATH'] + ";" + s.get("install_path", "C:\\Program Files\\") + ";" + s.get("texbin_path", "C:\\Program Files\\MiKTeX 2.9\\miktex\\bin\\")
@@ -252,7 +252,7 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
             debug("Can't find %s. Letting Pandoc deal with it." % lookFor)
             return prepend + lookFor if prepend else lookFor
 
-        sublime.error_message("Fatal error looking for " + lookFor)
+        sublime.error_message("Fatal error looking for {0}".format(lookFor))
         return None
 
     def buildPandocCmd(self, inFile, to, pandoc_from, a):
@@ -378,6 +378,7 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
         cmd.append(inFile)
 
         return cmd
+
 
 class PandownOutViewEraseCommand(sublime_plugin.TextCommand):
     def run(self, edit):
