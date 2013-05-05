@@ -39,9 +39,9 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
             env.update(user_env)
         env.update(os.environ.copy())
         if sublime.platform() == "osx" or sublime.platform() == "linux":
-            env['PATH'] = env['PATH'] + ":" + s.get("install_path", "/usr/local/bin") + ":" + s.get("texbin_path", "/usr/texbin")
+            env['PATH'] = s.get("install_path", "/usr/local/bin") + ":" + s.get("texbin_path", "/usr/texbin") + ":" + env['PATH']
         else:
-            env['PATH'] = env['PATH'] + ";" + s.get("install_path", "C:\\Program Files\\") + ";" + s.get("texbin_path", "C:\\Program Files\\MiKTeX 2.9\\miktex\\bin\\")
+            env['PATH'] = s.get("install_path", "C:\\Program Files\\") + ";" + s.get("texbin_path", "C:\\Program Files\\MiKTeX 2.9\\miktex\\bin\\") + ";" + env['PATH']
             env['PATH'] = str(env['PATH'])
 
         if not self.checkPandoc(env):
