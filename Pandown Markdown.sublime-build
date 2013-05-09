@@ -8,10 +8,6 @@
 		{ "name": "Run",
 		  "do_open": true
 		},
-		{ "name": "Pandown: PDF",
-		  "flag_pdf": true,
-		  "prevent_viewing": true
-		},
 		{ "name": "Pandown: Native Haskell",
 		  "pandoc_to": ["native", ".hs"]
 		},
@@ -36,8 +32,16 @@
 		{ "name": "Pandown: LaTeX",
 		  "pandoc_to": ["latex", ".tex"]
 		},
+		{ "name": "Pandown: LaTeX - PDF",
+		  "pandoc_to": ["latex", ".pdf"],
+		  "prevent_viewing": true
+		},
 		{ "name": "Pandown: LaTeX Beamer Slideshow",
 		  "pandoc_to": ["beamer", ".tex"]
+		},
+		{ "name": "Pandown: LaTeX Beamer Slideshow - PDF",
+		  "pandoc_to": ["beamer", ".pdf"],
+		  "prevent_viewing": true
 		},
 		{ "name": "Pandown: ConTeXt",
 		  "pandoc_to": ["context", ".tex"]
