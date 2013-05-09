@@ -29,7 +29,7 @@ def err(e):
 
 
 class PandownBuildCommand(sublime_plugin.WindowCommand):
-    def run(self, pandoc_from="", pandoc_to=["", ""], do_open=False, prevent_viewing=False, flag_pdf=False, to_window=False, **kwargs):
+    def run(self, pandoc_from="", pandoc_to=["", ""], do_open=False, prevent_viewing=False, to_window=False, **kwargs):
         global DEBUG_MODE, __ST3
         env = {}
         self.view = self.window.active_view()
@@ -61,7 +61,6 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
 
         if inFile == None:
             self.toWindow = True
-            self.makePDF = False
             self.workingDIR = ""
             workingTemp = tempfile.NamedTemporaryFile("w+", delete=False)
             buff = self.view.substr(sublime.Region(0, self.view.size()))
@@ -77,7 +76,6 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
             os.chdir(self.workingDIR)
             self.shouldOpen = True if ((s.get("always_open", False) or do_open) and not prevent_viewing) else False
             self.shouldDisplay = True if (s.get("always_display", False) and not prevent_viewing) else False
-            self.makePDF = flag_pdf
             self.toWindow = to_window
             workingTemp = None
 
@@ -329,11 +327,11 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
                 md_config += append
             pandoc_from = md_config
 
-        if self.makePDF:
-            self.outFile = os.path.splitext(inFile)[0] + ".pdf" if not self.criticized else os.path.splitext(self.origIn)[0] + ".pdf"
-            cmd.append("--output=" + self.outFile)
-            cmd.append("--from=" + pandoc_from)
-        elif self.toWindow:
+        # if self.makePDF:
+        #     self.outFile = os.path.splitext(inFile)[0] + ".pdf" if not self.criticized else os.path.splitext(self.origIn)[0] + ".pdf"
+        #     cmd.append("--output=" + self.outFile)
+        #     cmd.append("--from=" + pandoc_from)
+        if self.toWindow:
             pass
         else:
             self.outFile = os.path.splitext(inFile)[0] + to[1] if not self.criticized else os.path.splitext(self.origIn)[0] + to[1]
