@@ -1,0 +1,9 @@
+        PANDOWN FOR SUBLIME TEXT 2 & 3
+              by Daniel Shannon
+    ======================================
+        Pandown was failing to load
+        several resources correctly if
+        installed by a late version of
+        Package Control as a zipped
+        package archive. This should be
+        corrected as of now.

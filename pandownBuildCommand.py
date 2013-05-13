@@ -7,7 +7,7 @@ import time
 import subprocess
 import json
 if __ST3:
-    import Pandown.minify_json
+    import Pandown.minify_json as minify_json
     from Pandown.pandownCriticPreprocessor import *
 else:
     import minify_json
@@ -257,18 +257,15 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
         __ST3 = int(sublime.version()) >= 3000
         cmd = ['pandoc']
 
-        try:
-            f = codecs.open(os.path.join(sublime.packages_path(), 'Pandown', '.default-pandoc-config-plain.json'), "r", "utf-8")
-        except IOError as e:
-            sublime.error_message("Could not open default configuration file.")
-            err("Pandown Exception: " + str(e))
-            err("See README for help and support information.")
-            return None
+        unzipped = os.path.join(sublime.packages_path(), 'Pandown', '.default-pandoc-config-plain.json')
+        if os.path.exists(unzipped):
+            with codecs.open(unzipped, "r", "utf-8") as f:
+                s = json.load(f)
+            s = s["pandoc_arguments"]
         else:
-            s = json.load(f)
-            f.close()
-            sArg = s["pandoc_arguments"]
-            s = sArg
+            r = sublime.load_resource("Packages/Pandown/.default-pandoc-config-plain.json")
+            s = json.loads(r)
+            s = s["pandoc_arguments"]
         
         s["command_arguments"]["indented-code-classes"].extend(a["command_arguments"].pop("indented-code-classes", []))
         s["command_arguments"]["variables"].update(a["command_arguments"].pop("variables", {}))
@@ -283,18 +280,16 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
         configLoc = self.walkIncludes("pandoc-config.json")
         if configLoc:
             try:
-                f = open(configLoc)
+                f = codecs.open(configLoc, "r", "utf-8")
             except IOError as e:
                 sublime.status_message("Error: pandoc-config exists, but could not be read.")
                 err("Pandown Exception: " + str(e))
                 err("See README for help and support information.")
+                f.close()
             else:
                 pCommentedStr = f.read()
                 f.close()
-                if int(sublime.version()) >= 3000:
-                    pStr = Pandown.minify_json.json_minify(pCommentedStr)
-                else:
-                    pStr = minify_json.json_minify(pCommentedStr)
+                pStr = minify_json.json_minify(pCommentedStr)
                 try:
                     p = json.loads(pStr)
                 except (KeyError, ValueError) as e:

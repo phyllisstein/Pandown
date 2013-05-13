@@ -19,18 +19,26 @@ class PandownTouchProjectConfigCommand(sublime_plugin.WindowCommand):
 
         defaultConfigFile = os.path.join(sublime.packages_path(), 'Pandown', 'default-pandoc-config.json')
         userConfigFile = os.path.join(sublime.packages_path(), 'User', 'pandoc-config.json')
+
         if not os.path.exists(defaultConfigFile) and not os.path.exists(userConfigFile):
-            sublime.status_message("Could not find default Pandoc configuration.")
-            print("[Pandown stores default configuration information in Projects/Pandown/default-pandoc-config.json.]")
-            print("[If this file has been moved or deleted, please reinstall Pandown.]")
-            print("[See the README for support information.]")
-            return
-        try:
-            toCopy = defaultConfigFile if (not os.path.exists(userConfigFile)) else userConfigFile
-            shutil.copy(toCopy, configFile)
-        except Exception as e:
-            sublime.status_message("Could not write " + configFile)
-            print("[Pandown encountered an exception:]")
-            print("[e: " + str(e) + "]")
-        else:
+            try:
+                s = sublime.load_resource("Packages/Pandown/default-pandoc-config.json")
+            except OSError as e:
+                sublime.status_message("Could not load default Pandoc configuration.")
+                print("[Pandown could not find a default configuration file in Packages/Pandown/default-pandoc-config.json]")
+                print("[Loading from the binary package resource file also failed.]")
+                return
+            with open(configFile, "w") as f:
+                f.write(s)
             self.window.open_file(configFile)
+
+        else:
+            try:
+                toCopy = defaultConfigFile if not os.path.exists(userConfigFile) else userConfigFile
+                shutil.copy(toCopy, configFile)
+            except Exception as e:
+                sublime.status_message("Could not write {0}".format(configFile))
+                print("[Pandown encountered an exception:]")
+                print("[e: {0}]".format(e))
+            else:
+                self.window.open_file(configFile)
