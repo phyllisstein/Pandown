@@ -67,6 +67,7 @@
 			"no-wrap": false,
 			"columns": false,
 			"table-of-contents": false,
+			"toc-depth": false,
 			"no-highlight": false,
 			"highlight-style": "pygments",
 			"include-in-header": [],

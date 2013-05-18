@@ -264,6 +264,10 @@
 			// Generate and include a table of contents.
 			"table-of-contents": false,
 
+			// The number of section levels to include in the table of contents.
+			// Specify a number or "false" for default (3).
+			"toc-depth": false,
+
 			// Disable syntax highlighting globally.
 			"no-highlight": false,
 
