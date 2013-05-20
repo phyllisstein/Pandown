@@ -336,10 +336,10 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
 
         command_arguments = s["command_arguments"]
         for (k, v) in command_arguments.items():
-            if v == True:
-                cmd.append("--%s" % k)
-            elif v == False:
+            if v == False:
                 pass
+            elif v == True and k != "toc-depth" and k != "base-header-level" and k != "slide-level" and k != "tab-stop":
+                cmd.append("--%s" % k)
             elif isinstance(v, list) and len(v) > 0:
                 if k == "indented-code-classes" or k == "number-offset":
                     buff = "--%s=" % k
