@@ -35,14 +35,14 @@
 		{ "name": "Pandown: LaTeX - PDF",
 		  "pandoc_to": ["latex", ".pdf"],
 		  "prevent_viewing": true
-		}
+		},
 		{ "name": "Pandown: LaTeX Beamer Slideshow",
 		  "pandoc_to": ["beamer", ".tex"]
 		},
 		{ "name": "Pandown: LaTeX Beamer Slideshow - PDF",
 		  "pandoc_to": ["beamer", ".pdf"],
 		  "prevent_viewing": true
-		}
+		},
 		{ "name": "Pandown: ConTeXt",
 		  "pandoc_to": ["context", ".tex"]
 		},
