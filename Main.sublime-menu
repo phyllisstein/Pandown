@@ -16,16 +16,16 @@
                         "children":
                         [
                             {
-                                "command": "pandown_display_defaults", "args":
+                                "command": "open_file", "args":
                                 {
-                                    "fn": "README.mdown"
+                                    "file": "${packages}/Pandown/README.mdown"
                                 },
                                 "caption": "README"
                             },
                             {
-                                "command": "pandown_display_defaults", "args":
+                                "command": "open_file", "args":
                                 {
-                                    "fn": "changelog.mdown"
+                                    "file": "${packages}/Pandown/changelog.mdown"
                                 },
                                 "caption": "changelog"
                             },
@@ -33,7 +33,7 @@
                                 "caption": "-"
                             },
                             {
-                                "command": "pandown_display_defaults", "args":
+                                "command": "open_file", "args":
                                 {
                                     "file": "Pandown.sublime-settings"
                                 },

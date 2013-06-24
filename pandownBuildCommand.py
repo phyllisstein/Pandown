@@ -13,16 +13,14 @@ else:
     import minify_json
     from pandownCriticPreprocessor import *
 import tempfile
-import re
 
 DEBUG_MODE = False
-
-
 
 
 def debug(theMessage):
     if DEBUG_MODE:
         print("[Pandown: " + str(theMessage) + "]")
+
 
 def err(e):
     print("[Pandown: " + str(e) + "]")
@@ -59,7 +57,7 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
 
         inFile = self.view.file_name()
 
-        if inFile == None:
+        if inFile is None:
             self.toWindow = True
             self.workingDIR = ""
             workingTemp = tempfile.NamedTemporaryFile("w+", delete=False)
@@ -257,16 +255,16 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
         __ST3 = int(sublime.version()) >= 3000
         cmd = ['pandoc']
 
-        unzipped = os.path.join(sublime.packages_path(), 'Pandown', '.default-pandoc-config-plain.json')
+        unzipped = os.path.join(sublime.packages_path(), 'Pandown', 'default-pandoc-config-plain.json')
         if os.path.exists(unzipped):
             with codecs.open(unzipped, "r", "utf-8") as f:
                 s = json.load(f)
             s = s["pandoc_arguments"]
         else:
-            r = sublime.load_resource("Packages/Pandown/.default-pandoc-config-plain.json")
+            r = sublime.load_resource("Packages/Pandown/default-pandoc-config-plain.json")
             s = json.loads(r)
             s = s["pandoc_arguments"]
-        
+
         s["command_arguments"]["indented-code-classes"].extend(a["command_arguments"].pop("indented-code-classes", []))
         s["command_arguments"]["variables"].update(a["command_arguments"].pop("variables", {}))
         s["command_arguments"]["include-in-header"].extend(a["command_arguments"].pop("include-in-header", []))
@@ -336,9 +334,9 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
 
         command_arguments = s["command_arguments"]
         for (k, v) in command_arguments.items():
-            if v == False:
+            if v is False:
                 pass
-            elif v == True and k != "toc-depth" and k != "base-header-level" and k != "slide-level" and k != "tab-stop":
+            elif v is True and k != "toc-depth" and k != "base-header-level" and k != "slide-level" and k != "tab-stop":
                 cmd.append("--%s" % k)
             elif isinstance(v, list) and len(v) > 0:
                 if k == "indented-code-classes" or k == "number-offset":
@@ -356,7 +354,7 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
                         for item in _v:
                             cmd.append("--variable=" + _k + ":" + item)
                     else:
-                        if _v != False:
+                        if _v is not False:
                             cmd.append("--variable=" + _k + ":" + _v)
             elif not __ST3 and (((isinstance(v, unicode) or isinstance(v, str)) and len(v) > 0) or isinstance(v, int)):
                 if k == "template":
