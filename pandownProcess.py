@@ -4,7 +4,6 @@ import sublime_plugin
 import time
 import os
 import subprocess
-import sys
 import threading
 import functools
 
@@ -90,7 +89,7 @@ class PandownAsyncProcess(object):
 
 
 class PandownExecCommand(sublime_plugin.WindowCommand, PandownProcessListener):
-    def run(self, cmd=None, env={}, file_regex="", line_regex="", encoding="utf-8", quiet=False, kill=False, word_wrap=True, syntax="Packages/Text/Plain text.tmLanguage", working_dir="", output_view=None, **kwargs):
+    def run(self, cmd=None, env={}, file_regex="", line_regex="", encoding="utf-8", quiet=True, kill=False, word_wrap=True, syntax="Packages/Text/Plain text.tmLanguage", working_dir="", output_view=None, **kwargs):
         __ST3 = int(sublime.version()) >= 3000
         if kill:
             if self.proc:
@@ -268,3 +267,4 @@ class PandownExecCommand(sublime_plugin.WindowCommand, PandownProcessListener):
 
     def on_finished(self, proc):
         sublime.set_timeout(functools.partial(self.finish, proc), 0)
+ proc), 0)

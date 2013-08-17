@@ -3,7 +3,10 @@
 ## Notes
 As of March 2013, Pandown is _fully compatible with Sublime Text 2 and Sublime Text 3_. "Pandown3" was ported back to ST2, bringing benefits to stability and performance, compatibility with Pandoc versions higher than 1.10, and dual-compatibility, in one Github repository and one project, with the two most recent versions of Sublime. "Pandown3" will no longer be supported; any changes and improvements made will be to the single repository available at <https://github.com/phyllisstein/Pandown>. The stable version is being assigned the number 2.0, and was completed on 25 March 2013.
 
-# Changes and Improvements---03/26/13
+## Changes and Improvements---08/17/13
+* Regressions in last version that went unnoticed till I installed a fresh ST3 should be corrected.
+
+## Changes and Improvements---03/26/13
 * Dual compatibility with ST2 and ST3.
 * The `pandoc-config.json` file now uses a slightly different syntax. In order to accommodate Pandoc's new Markdown-extensions feature, the configuration files were split into two dictionaries, `"markdown_extensions"` and `"command_arguments"`. See the default configuration file at `{Packages}/default-pandoc-config.json`, or the settings files, for a guide to what now belongs where. _Users **must** update their `pandoc-config.json` and `{Packages}/User/Pandown.sublime-settings` files_.
 * Pandown now supports the CriticMarkup syntax, showcased at <http://criticmarkup.com>. Though disabled by default, it can be enabled by setting the `"preprocess_critic"` option to `true` in your `.sublime-settings` file and passing the variable `"critic": true` in your `pandoc-config.json` file. If you're not using the included "Github" template, you'll need to copy everything from `$if(critic)$` to the next `$endif$` out of that template and paste it into your own.

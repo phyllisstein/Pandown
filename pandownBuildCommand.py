@@ -233,6 +233,7 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
             return prepend + lookFor if prepend else lookFor
         # Is the file in the includes_paths?
         for pathToCheck in self.includes_paths:
+            pathToCheck = os.path.expanduser(pathToCheck)
             pathToCheck = os.path.abspath(pathToCheck)
             fileToCheck = os.path.join(pathToCheck, lookFor)
             if os.path.isfile(fileToCheck):
@@ -273,7 +274,7 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
         s["command_arguments"]["css"].extend(a["command_arguments"].pop("css", []))
         s["command_arguments"]["number-offset"].extend(a["command_arguments"].pop("number-offset", []))
         s["command_arguments"].update(a["command_arguments"])
-        s["markdown_extensions"].update(a["markdown_extensions"])
+        s["markdown_extensions"].update(a.get("markdown_extensions", {}))
 
         configLoc = self.walkIncludes("pandoc-config.json")
         if configLoc:

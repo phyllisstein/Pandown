@@ -3,6 +3,7 @@ import sublime
 import sublime_plugin
 import os
 import shutil
+import codecs
 
 
 class PandownTouchProjectConfigCommand(sublime_plugin.WindowCommand):
@@ -27,8 +28,9 @@ class PandownTouchProjectConfigCommand(sublime_plugin.WindowCommand):
                 sublime.status_message("Could not load default Pandoc configuration.")
                 print("[Pandown could not find a default configuration file in Packages/Pandown/default-pandoc-config.json]")
                 print("[Loading from the binary package resource file also failed.]")
+                print("[e: {0}]".format(e))
                 return
-            with open(configFile, "w") as f:
+            with codecs.open(configFile, "w", "utf-8") as f:
                 f.write(s)
             self.window.open_file(configFile)
 

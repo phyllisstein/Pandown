@@ -1,0 +1,7 @@
+		PANDOWN FOR SUBLIME TEXT 2 & 3
+			  by Daniel Shannon
+	======================================
+		Fixed several regressions in
+		recent versions of Pandown that
+		went unnoticed till I myself
+		started with a fresh Sublime setup.

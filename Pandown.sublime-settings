@@ -223,14 +223,14 @@
 			// directory tree. Note that this is not an all-purpose includes
 			// directory---Pandoc will only look for these files and folders.
 			// 		data_dir/
-			//			reference.odt
-			//			reference.docx
-			//			default.csl
-			//			epub.css
-			//			slidy/
-			//			slideous/
-			//			s5/
-			//			templates/
+			//			|-- reference.odt
+			//			|-- reference.docx
+			//			|-- default.csl
+			//			|-- epub.css
+			//			|-- slidy/
+			//			|-- slideous/
+			//			|-- s5/
+			//			|-- templates/
 			// Anything placed under templates and will be found by the "template"
 			// setting; otherwise, to set an include directory, use the "includes_paths"
 			// option above.
@@ -316,7 +316,7 @@
 			// "espresso", "zenburn", "haddock", "tango"
 			"highlight-style": "pygments",
 
-			
+
 			// Supply lists of files---NOT single file names---to include verbatim in the output.
 			// This is correct:
 			//			"include_in_header": [ "myfile" ]
@@ -388,7 +388,7 @@
 
 			// Conceal mailto: links from robots.
 			// Acceptable values: "none", "javascript", "references"
-			"email-obfuscation": "references",
+			"email-obfuscation": "javascript",
 
 			// "Specify a prefix to be added to all automatically generated identifiers
 			// in HTML output. This is useful for preventing duplicate identifiers when
