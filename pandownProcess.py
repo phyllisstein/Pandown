@@ -267,4 +267,3 @@ class PandownExecCommand(sublime_plugin.WindowCommand, PandownProcessListener):
 
     def on_finished(self, proc):
         sublime.set_timeout(functools.partial(self.finish, proc), 0)
- proc), 0)
