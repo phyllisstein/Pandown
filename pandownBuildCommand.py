@@ -136,7 +136,7 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
     def checkPandoc(self, env):
         cmd = ['pandoc', '--version']
         try:
-            output = subprocess.check_call(cmd, env=env, shell=True)
+            output = subprocess.check_call(cmd, env=env, shell=False)
         except Exception as e:
             err("Exception: " + str(e))
             return False

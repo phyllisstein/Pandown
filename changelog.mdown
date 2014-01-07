@@ -3,6 +3,9 @@
 ## Notes
 As of March 2013, Pandown is _fully compatible with Sublime Text 2 and Sublime Text 3_. "Pandown3" was ported back to ST2, bringing benefits to stability and performance, compatibility with Pandoc versions higher than 1.10, and dual-compatibility, in one Github repository and one project, with the two most recent versions of Sublime. "Pandown3" will no longer be supported; any changes and improvements made will be to the single repository available at <https://github.com/phyllisstein/Pandown>. The stable version is being assigned the number 2.0, and was completed on 25 March 2013.
 
+## Bug Fix---01/07/2014
+Thanks to Github user [jareciog](https://github.com/jareciog)'s keen eyes, a crash under ST2 has been fixed.
+
 ## Changes and Improvements---08/17/13
 * Regressions in last version that went unnoticed till I installed a fresh ST3 should be corrected.
 
