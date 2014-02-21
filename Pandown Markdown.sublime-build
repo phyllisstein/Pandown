@@ -1,128 +1,128 @@
 {
-	"selector": "text.html.markdown",
-	"target": "pandown_build",
-	"pandoc_from": "markdown",
-	"pandoc_to": ["html", ".html"],
+  "selector": "text.html.markdown",
+  "target": "pandown_build",
+  "pandoc_from": "markdown",
+  "pandoc_to": ["html", ".html"],
 
-	"variants": [
-		{ "name": "Run",
-		  "do_open": true
-		},
-		{ "name": "Pandown: Native Haskell",
-		  "pandoc_to": ["native", ".hs"]
-		},
-		{ "name": "Pandown: JSON",
-		  "pandoc_to": ["json", ".json"]
-		},
-		{ "name": "Pandown: Plain Text",
-		  "pandoc_to": ["plain", ".txt"]
-		},
-		// { "name": "Pandown: Markdown",
-		//   "pandoc_to": ["markdown", ".mdown"]
-		// },
-		{ "name": "Pandown: reStructuredText",
-		  "pandoc_to": ["rst", ".rst"]
-		},
-		{ "name": "Pandown: XHTML 1",
-		  "pandoc_to": ["html", ".html"]
-		},
-		{ "name": "Pandown: HTML 5",
-		  "pandoc_to": ["html5", ".html"]
-		},
-		{ "name": "Pandown: LaTeX",
-		  "pandoc_to": ["latex", ".tex"]
-		},
-		{ "name": "Pandown: LaTeX - PDF",
-		  "pandoc_to": ["latex", ".pdf"],
-		  "prevent_viewing": true
-		},
-		{ "name": "Pandown: LaTeX Beamer Slideshow",
-		  "pandoc_to": ["beamer", ".tex"]
-		},
-		{ "name": "Pandown: LaTeX Beamer Slideshow - PDF",
-		  "pandoc_to": ["beamer", ".pdf"],
-		  "prevent_viewing": true
-		},
-		{ "name": "Pandown: ConTeXt",
-		  "pandoc_to": ["context", ".tex"]
-		},
-		{ "name": "Pandown: Groff Man",
-		  "pandoc_to": ["man", ".man"]
-		},
-		{ "name": "Pandown: MediaWiki Markup",
-		  "pandoc_to": ["mediawiki", ".txt"]
-		},
-		{ "name": "Pandown: Textile",
-		  "pandoc_to": ["textile", ".textile"]
-		},
-		{ "name": "Pandown: Emacs Org-Mode",
-		  "pandoc_to": ["org", ".org"]
-		},
-		{ "name": "Pandown: GNU Texinfo",
-		  "pandoc_to": ["texinfo", ".texinfo"]
-		},
-		{ "name": "Pandown: DocBook XML",
-		  "pandoc_to": ["docbook", ".xml"]
-		},
-		{ "name": "Pandown: OpenDocument XML",
-		  "pandoc_to": ["opendocument", ".odt"]
-		},
-		{ "name": "Pandown: OpenOffice Document",
-		  "pandoc_to": ["odt", ".odt"],
-		  "prevent_viewing": true
-		},
-		{ "name": "Pandown: Word Document",
-		  "pandoc_to": ["docx", ".docx"],
-		  "prevent_viewing": true
-		},
-		{ "name": "Pandown: EPUB Book",
-		  "pandoc_to": ["epub", ".epub"],
-		  "prevent_viewing": true
-		},
-		{ "name": "Pandown: EPUB3",
-		  "pandoc_to": ["epub", ".epub"],
-		  "prevent_viewing": true
-		},
-		{ "name": "Pandown: FictionBooks 2",
-		  "pandoc_to": ["fb2", ".fb2"],
-		  "prevent_viewing": true
-		},
-		{ "name": "Pandown: AsciiDoc",
-		  "pandoc_to": ["asciidoc", ".txt"]
-		},
-		{ "name": "Pandown: Slidy HTML/JS Slideshow",
-		  "pandoc_to": ["slidy", ".html"]
-		},
-		{ "name": "Pandown: Slideous HTML/JS Slideshow",
-		  "pandoc_to": ["slideous", ".html"]
-		},
-		{ "name": "Pandown: DZSlides HTML5/JS Slideshow",
-		  "pandoc_to": ["dzslides", ".html"]
-		},
-		{ "name": "Pandown: S5 HTML/JS Slideshow",
-		  "pandoc_to": ["s5", ".html"]
-		},
-		{ "name": "Pandown: Rich Text (RTF)",
-		  "pandoc_to": ["rtf", ".rtf"],
-		  "prevent_viewing": true
-		},
-		{ "name": "Pandown: Markdown with Literate Haskell",
-		  "pandoc_to": ["markdown+lhs", ".mdown"]
-		},
-		{ "name": "Pandown: reStructuredText with Literate Haskell",
-		  "pandoc_to": ["rst+lhs", ".rst"]
-		},
-		{ "name": "Pandown: LaTeX with Literate Haskell",
-		  "pandoc_to": ["latex+lhs", ".tex"]
-		},
-		{ "name": "Pandown: Beamer with Literate Haskell",
-		  "pandoc_to": ["beamer+lhs", ".tex"]
-		},
-		{ "name": "Pandown: XHTML 1 with Literate Haskell",
-		  "pandoc_to": ["html+lhs", ".html"]
-		},
-		{ "name": "Pandown: HTML5 with Literate Haskell",
-		  "pandoc_to": ["html5+lhs", ".html"]
-		}
-	]
+  "variants": [
+    { "name": "Run",
+      "do_open": true
+    },
+    { "name": "Pandown: Native Haskell",
+      "pandoc_to": ["native", ".hs"]
+    },
+    { "name": "Pandown: JSON",
+      "pandoc_to": ["json", ".json"]
+    },
+    { "name": "Pandown: Plain Text",
+      "pandoc_to": ["plain", ".txt"]
+    },
+    { "name": "Pandown: Markdown",
+      "pandoc_to": ["markdown", ".md"]
+    },
+    { "name": "Pandown: reStructuredText",
+      "pandoc_to": ["rst", ".rst"]
+    },
+    { "name": "Pandown: XHTML 1",
+      "pandoc_to": ["html", ".html"]
+    },
+    { "name": "Pandown: HTML 5",
+      "pandoc_to": ["html5", ".html"]
+    },
+    { "name": "Pandown: LaTeX",
+      "pandoc_to": ["latex", ".tex"]
+    },
+    { "name": "Pandown: LaTeX - PDF",
+      "pandoc_to": ["latex", ".pdf"],
+      "prevent_viewing": true
+    },
+    { "name": "Pandown: LaTeX Beamer Slideshow",
+      "pandoc_to": ["beamer", ".tex"]
+    },
+    { "name": "Pandown: LaTeX Beamer Slideshow - PDF",
+      "pandoc_to": ["beamer", ".pdf"],
+      "prevent_viewing": true
+    },
+    { "name": "Pandown: ConTeXt",
+      "pandoc_to": ["context", ".tex"]
+    },
+    { "name": "Pandown: Groff Man",
+      "pandoc_to": ["man", ".man"]
+    },
+    { "name": "Pandown: MediaWiki Markup",
+      "pandoc_to": ["mediawiki", ".txt"]
+    },
+    { "name": "Pandown: Textile",
+      "pandoc_to": ["textile", ".textile"]
+    },
+    { "name": "Pandown: Emacs Org-Mode",
+      "pandoc_to": ["org", ".org"]
+    },
+    { "name": "Pandown: GNU Texinfo",
+      "pandoc_to": ["texinfo", ".texinfo"]
+    },
+    { "name": "Pandown: DocBook XML",
+      "pandoc_to": ["docbook", ".xml"]
+    },
+    { "name": "Pandown: OpenDocument XML",
+      "pandoc_to": ["opendocument", ".odt"]
+    },
+    { "name": "Pandown: OpenOffice Document",
+      "pandoc_to": ["odt", ".odt"],
+      "prevent_viewing": true
+    },
+    { "name": "Pandown: Word Document",
+      "pandoc_to": ["docx", ".docx"],
+      "prevent_viewing": true
+    },
+    { "name": "Pandown: EPUB Book",
+      "pandoc_to": ["epub", ".epub"],
+      "prevent_viewing": true
+    },
+    { "name": "Pandown: EPUB3",
+      "pandoc_to": ["epub", ".epub"],
+      "prevent_viewing": true
+    },
+    { "name": "Pandown: FictionBooks 2",
+      "pandoc_to": ["fb2", ".fb2"],
+      "prevent_viewing": true
+    },
+    { "name": "Pandown: AsciiDoc",
+      "pandoc_to": ["asciidoc", ".txt"]
+    },
+    { "name": "Pandown: Slidy HTML/JS Slideshow",
+      "pandoc_to": ["slidy", ".html"]
+    },
+    { "name": "Pandown: Slideous HTML/JS Slideshow",
+      "pandoc_to": ["slideous", ".html"]
+    },
+    { "name": "Pandown: DZSlides HTML5/JS Slideshow",
+      "pandoc_to": ["dzslides", ".html"]
+    },
+    { "name": "Pandown: S5 HTML/JS Slideshow",
+      "pandoc_to": ["s5", ".html"]
+    },
+    { "name": "Pandown: Rich Text (RTF)",
+      "pandoc_to": ["rtf", ".rtf"],
+      "prevent_viewing": true
+    },
+    { "name": "Pandown: Markdown with Literate Haskell",
+      "pandoc_to": ["markdown+lhs", ".md"]
+    },
+    { "name": "Pandown: reStructuredText with Literate Haskell",
+      "pandoc_to": ["rst+lhs", ".rst"]
+    },
+    { "name": "Pandown: LaTeX with Literate Haskell",
+      "pandoc_to": ["latex+lhs", ".tex"]
+    },
+    { "name": "Pandown: Beamer with Literate Haskell",
+      "pandoc_to": ["beamer+lhs", ".tex"]
+    },
+    { "name": "Pandown: XHTML 1 with Literate Haskell",
+      "pandoc_to": ["html+lhs", ".html"]
+    },
+    { "name": "Pandown: HTML5 with Literate Haskell",
+      "pandoc_to": ["html5+lhs", ".html"]
+    }
+  ]
 }
