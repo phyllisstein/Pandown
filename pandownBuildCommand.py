@@ -103,7 +103,7 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
             sublime.error_message("Pandown: Error constructing Pandoc command.")
             return
 
-        if sublime.load_settings("Preferences.sublime-settings").get("show_panel_on_build", True):
+        if self.view.settings().get("show_panel_on_build", True):
             self.window.run_command("show_panel", {"panel": "output.exec"})
 
         if not self.toWindow:
