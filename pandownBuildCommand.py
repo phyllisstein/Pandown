@@ -42,9 +42,9 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
             env['PATH'] = s.get("install_path", "C:\\Program Files\\") + ";" + s.get("texbin_path", "C:\\Program Files\\MiKTeX 2.9\\miktex\\bin\\") + ";" + env['PATH']
             env['PATH'] = str(env['PATH'])
 
-        if not self.checkPandoc(env):
-            sublime.error_message("Pandown requires Pandoc")
-            return
+        # if not self.checkPandoc(env):
+        #     sublime.error_message("Pandown requires Pandoc")
+        #     return
 
         DEBUG_MODE = s.get("PANDOWN_DEBUG", False)
 
