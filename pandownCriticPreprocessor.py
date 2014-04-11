@@ -66,7 +66,8 @@ class PandownCriticPreprocessor:
 
         subs_pattern = r'''(?s)\{\~\~(?P<original>(?:[^\~\>]|(?:\~(?!\>)))+)\~\>(?P<new>(?:[^\~\~]|(?:\~(?!\~\})))+)\~\~\}'''
 
-        mark_pattern = r'''(?s)\{\{(?P<value>.*?)\}\}'''
+        # mark_pattern = r'''(?s)\{\{(?P<value>.*?)\}\}'''
+        mark_pattern = r'''(?s)\{==(?P<value>.*?)==\}'''
 
         with codecs.open(inFile, "r", "utf-8") as f:
             h = f.read()
