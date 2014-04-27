@@ -72,7 +72,7 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
         else:
             self.workingDIR = os.path.dirname(inFile)
             os.chdir(self.workingDIR)
-            self.shouldOpen = True if ((s.get("always_open", False) or do_open) and not prevent_viewing) else False
+            self.shouldOpen = True if (s.get("always_open", False) or do_open) else False
             self.shouldDisplay = True if (s.get("always_display", False) and not prevent_viewing) else False
             self.toWindow = to_window
             workingTemp = None
