@@ -155,7 +155,13 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
         if self.shouldOpen:
             plat = sublime.platform()
             if plat == "osx":
-                subprocess.Popen(["open", self.outFile])
+                try:
+                    o = subprocess.check_output(["open", self.outFile], stderr=subprocess.STDOUT)
+                except CalledProcessError as e:
+                    err(e.output)
+                else:
+                    debug("subprocess: " + o)
+
             elif plat == "windows":
                 os.startfile(self.outFile)
             elif plat == "linux":
