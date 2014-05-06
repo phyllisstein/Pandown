@@ -157,7 +157,7 @@ class PandownBuildCommand(sublime_plugin.WindowCommand):
             if plat == "osx":
                 try:
                     o = subprocess.check_output(["open", self.outFile], stderr=subprocess.STDOUT)
-                except CalledProcessError as e:
+                except subprocess.CalledProcessError as e:
                     err(e.output)
                 else:
                     debug("subprocess: " + o)
