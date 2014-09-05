@@ -2,7 +2,7 @@
   "selector": "text.html.markdown",
   "target": "pandown_build",
   "pandoc_from": "markdown",
-  "pandoc_to": ["html", ".html"],
+  "pandoc_to": ["html5", ".html"],
 
   "variants": [
     { "name": "Run",
