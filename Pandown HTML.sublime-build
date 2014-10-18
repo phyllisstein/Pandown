@@ -1,27 +1,14 @@
 {
-	"selector": "text.html",
-	"target": "pandown_build",
-	"pandoc_from": "html",
-	"pandoc_to": ["markdown", ".mdown"],
+    "selector": "text.html",
+    "target": "pandown_build",
+    "pandoc_from": "html",
+    "pandoc_to": ["markdown", ".mdown"],
 
-	"variants": [
-		{ "name": "Pandown: PDF",
-		  "flag_pdf": true,
-		  "prevent_viewing": true
-		},
-		{ "name": "Pandown: Plain Text",
-		  "pandoc_to": ["plain", ".txt"]
-		},
-		{ "name": "Pandown: LaTeX",
-		  "pandoc_to": ["latex", ".tex"]
-		},
-		{ "name": "Pandown: Word Document",
-		  "pandoc_to": ["docx", ".docx"],
-		  "prevent_viewing": true
-		},
-		{ "name": "Pandown: Rich Text (RTF)",
-		  "pandoc_to": ["rtf", ".rtf"],
-		  "prevent_viewing": true
-		}
-	]
+    "variants": [
+        { "name": "Pandown: PDF", "flag_pdf": true, "prevent_viewing": true },
+        { "name": "Pandown: Plain Text", "pandoc_to": ["plain", ".txt"] },
+        { "name": "Pandown: LaTeX", "pandoc_to": ["latex", ".tex"] },
+        { "name": "Pandown: Word Document", "pandoc_to": ["docx", ".docx"], "prevent_viewing": true },
+        { "name": "Pandown: Rich Text (RTF)", "pandoc_to": ["rtf", ".rtf"], "prevent_viewing": true }
+    ]
 }
