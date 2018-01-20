@@ -229,9 +229,6 @@
 			// will be used.
 			"default-image-extension": "",
 			
-			// Merge adjacent elements, remove repeated spaces, etc.
-			"normalize": true,
-
 			// Set the number of spaces per tab. Should be set to
 			// "false" (for default behavior) or a number.
 			"tab-stop": false,
