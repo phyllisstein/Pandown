@@ -211,7 +211,14 @@
 
 			// Straight quotes into curly quotes, --- to em-dash, -- to en-dash,
 			// ... to ellipsis, nonbreaking spaces after certain abbreviations.
-			"smart": true
+			"smart": true,
+			
+			// "Parse untranslatable HTML codes as raw HTML, instead of ignoring them."
+			"raw_html": true,
+
+			// "Parse untranslatable LaTeX environments as raw LaTeX, instead of 
+			// ignoring them."
+			"raw_tex": true
 		},
 
 
@@ -239,10 +246,6 @@
 			// setting; otherwise, to set an include directory, use the "includes_paths"
 			// option above.
 			"data-dir": "",
-
-			// "Parse untranslatable HTML codes and LaTeX environments as
-			// raw HTML or LaTeX, instead of ignoring them."
-			"parse-raw": true,
 
 			// - before a numeral to en-dash, -- to em-dash
 			"old-dashes": false,
