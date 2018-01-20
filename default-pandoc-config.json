@@ -168,11 +168,12 @@
 
 			// Parses MMD-style header identifiers (in square brackets between header
 			// text and closing ATX #s.
-			"mmd_header_identifiers": false
+			"mmd_header_identifiers": false,
+
+			// Straight quotes into curly quotes, --- to em-dash, -- to en-dash,
+			// ... to ellipsis, nonbreaking spaces after certain abbreviations.
+			"smart": true
 		},
-
-
-
 
 		"command_arguments":
 		{
@@ -200,10 +201,6 @@
 			// "Parse untranslatable HTML codes and LaTeX environments as
 			// raw HTML or LaTeX, instead of ignoring them."
 			"parse-raw": true,
-
-			// Straight quotes into curly quotes, --- to em-dash, -- to en-dash,
-			// ... to ellipsis, nonbreaking spaces after certain abbreviations.
-			"smart": true,
 
 			// - before a numeral to en-dash, -- to em-dash
 			"old-dashes": false,

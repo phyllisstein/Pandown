@@ -44,13 +44,13 @@
 			"abbreviations": false,
 			"autolink_bare_uris": false,
 			"link_attributes": false,
-			"mmd_header_identifiers": false
+			"mmd_header_identifiers": false,
+			"smart": true
 		},
 		"command_arguments":
 		{
 			"data-dir": "",
 			"parse-raw": true,
-			"smart": true,
 			"old-dashes": false,
 			"base-header-level": false,
 			"indented-code-classes":
