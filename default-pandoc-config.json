@@ -168,11 +168,19 @@
 
 			// Parses MMD-style header identifiers (in square brackets between header
 			// text and closing ATX #s.
-			"mmd_header_identifiers": false
+			"mmd_header_identifiers": false,
+
+			// Straight quotes into curly quotes, --- to em-dash, -- to en-dash,
+			// ... to ellipsis, nonbreaking spaces after certain abbreviations.
+			"smart": true,
+			
+			// "Parse untranslatable HTML codes as raw HTML, instead of ignoring them."
+			"raw_html": true,
+
+			// "Parse untranslatable LaTeX environments as raw LaTeX, instead of 
+			// ignoring them."
+			"raw_tex": true
 		},
-
-
-
 
 		"command_arguments":
 		{
@@ -196,14 +204,6 @@
 			// setting; otherwise, to set an include directory, use the "includes_paths"
 			// option above.
 			"data-dir": "",
-
-			// "Parse untranslatable HTML codes and LaTeX environments as
-			// raw HTML or LaTeX, instead of ignoring them."
-			"parse-raw": true,
-
-			// Straight quotes into curly quotes, --- to em-dash, -- to en-dash,
-			// ... to ellipsis, nonbreaking spaces after certain abbreviations.
-			"smart": true,
 
 			// - before a numeral to en-dash, -- to em-dash
 			"old-dashes": false,
@@ -229,9 +229,6 @@
 			// will be used.
 			"default-image-extension": "",
 			
-			// Merge adjacent elements, remove repeated spaces, etc.
-			"normalize": true,
-
 			// Set the number of spaces per tab. Should be set to
 			// "false" (for default behavior) or a number.
 			"tab-stop": false,
@@ -368,8 +365,7 @@
 			// "Use the specified file as a style reference in producing a [desired] file.
 			// For best results, the reference [file] should be a modified version of
 			// a [desired] file produced using pandoc."
-			"reference-odt": "",
-			"reference-docx": "",
+			"reference-doc": "",
 
 			// "Use the specified CSS file to style the EPUB. If no stylesheet is specified,
 			// pandoc will look for a file epub.css in the user data directory (see --data-dir).
