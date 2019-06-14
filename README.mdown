@@ -1,5 +1,19 @@
-# Pandown for Sublime Text 2 and 3
+# Deprecation Warning
+## Abandon All Hope, Ye Who Enter Here
+Proud as I was of Pandown when I put it together, at this point I can't really recommend you build your workflow around it. Not only is it _old_---I made the first commit in 2012, when Sublime Text was at major version 2---it's chock full of amateurish design problems---I was just picking up Python at the time, and wouldn't even start developing software professionally for another couple of years. Which is less about humility or perfectionism than about than about concern for the stability of your writing process.
 
+Pandoc has seen a nontrivial amount of evolution over the past seven years, and Pandown isn't equipped to support it---you can't specify multiple filers through Pandown, for example, or multiple bibliography files. And although Pandown is more flexible than other Sublime Markdown packages were at the time, it still thinks about Pandoc in a fairly brittle way. Pandoc is very powerful, and Pandown's efforts to expose and manage its power are clumsy at best. Glitches and hacks that look small now are going to grow exponentially as Pandoc gets more evolved and packs in more power. And since I'm not a Sublime user anymore and there's no community momentum to channel towards support, eventually Pandown is going to stop functioning.
+
+By comparison, John MacFarlane is by all evidence _way_ smarter than I am---in general for starters, but in particular about how to usefully extend Pandoc. Ditto Jon Skinner with Sublime. Their work is going to be around much, much longer than Pandown. So it might be worth pouring your time into getting familiar with them, rather than my clumsy interface between them. On the dev and customization side, Pandoc's filters are very much the way of the future; on the integration side, Sublime's custom build systems (q.v. <https://www.sublimetext.com/docs/3/build_systems.html> and <http://docs.sublimetext.info/en/latest/reference/build_systems/basics.html>) _should_ be easy enough to adapt to your particular workflow.
+
+This is pretty much the path I wound up taking myself, first with Atom's [`build`](https://github.com/noseglid/atom-build) package and then VS Code's [tasks](https://code.visualstudio.com/docs/editor/tasks). Wrapping a general-purpose build tool around my specific workflow was far easier and far more robust than trying to build and maintain a semi-general/semi-specific wrapper around Pandoc.
+
+Godspeed,
+d
+
+---
+
+# Pandown for Sublime Text 2 and 3
 ## Introduction
 This package is designed as a complete, versatile, and highly Subliminal [Sublime Text 2](http://sublimetext.com) and [Sublime Text 3](http://sublimetext.com/3) build wrapper for [Pandoc][] **version 1.10 or higher**. Written by [Daniel Shannon](http://daniel.sh) and inspired by jclement's [Pandoc (Markdown)](https://github.com/jclement/SublimePandoc) plugin, Pandown is intended to be simple and understandable out of the box but highly customizable behind the scenes. All Pandoc options are configurable, and all input and output formats are theoretically supported, with the [Markdown][] reader implemented most completely and some support for the HTML reader.
 
